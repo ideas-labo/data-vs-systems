@@ -176,18 +176,18 @@ class PromiseTuner:
         if not rules:
             return []
 
-            # 先准备一个轻量兜底版本
+        # Prepare a lightweight fallback version first
         filtered_rules = self.quick_filter_rules(X, y, rules, top_k=20, min_support=2)
         if not filtered_rules:
             return []
 
-        # 1. 构造 DataFrame：每列是一个 rule_feature，最后一列是 performance
+        # 1. Construct a DataFrame: each column is a rule_feature, and the last column is performance
         df = pd.DataFrame(X, columns=[f'rule_{i}' for i in range(len(rules))])
         df['perf'] = y
         data = df.to_numpy()
         num_features = data.shape[1]
 
-        # 2. 初始化因果结构 prior_knowledge
+        # 2. Initialize causal structure prior_knowledge
         try:
             graph, _ = fci(data, show_progress=False, verbose=False)
             adjacency_matrix = self.get_adjacency_matrix(graph)
@@ -201,12 +201,12 @@ class PromiseTuner:
             # print(f"[DEBUG] FCI failed or matrix invalid: {e}")
             # adjacency_matrix = np.zeros((num_features, num_features), dtype=int)
 
-        # 3. 构造 prior_knowledge
+        # 3. Construct prior_knowledge
         prior_knowledge = adjacency_matrix.copy()
-        prior_knowledge[-1, :-1] = 1  # perf 可以被所有 rule 影响
-        prior_knowledge[-1, -1] = -1  # perf 不影响任何其他变量
+        prior_knowledge[-1, :-1] = 1   # perf can be influenced by all rules
+        prior_knowledge[-1, -1] = -1  # perf can not influence other variables
 
-        # 4. 利用 DirectLiNGAM 拟合因果模型
+        # 4. Use DirectLiNGAM to fit the causal model
         purified = []
         try:
             model = lingam.DirectLiNGAM(prior_knowledge=prior_knowledge)
@@ -266,37 +266,37 @@ class PromiseTuner:
 
     def modify_domains_by_rule(self, rule, original_domains, feature_names):
         """
-        按规则裁剪每一维的取值域（dataset mode）。
-        - 枚举维：阈值视为“索引阈值”，保留 index<=thr 或 >thr（保持原顺序）
-        - 数值维：阈值视为“数值阈值”，保留 <=thr 或 >thr 的取值（按域中出现的值）
-        返回裁剪后的 domains；若某维被裁到空，返回 None。
+        Trim the value domain of each dimension based on the rules (dataset mode).
+        - For categorical dimensions: treat the threshold as an "index threshold" and keep values with index <= thr or > thr (preserve original order).
+        - For numerical dimensions: treat the threshold as a "numerical threshold" and keep values <= thr or > thr (based on values in the domain).
+        Return the trimmed domains; if any dimension is trimmed to empty, return None.
         """
         domains = copy.deepcopy(original_domains)
 
         for r_knob, threshold, direction in rule:
             if r_knob not in feature_names:
-                # 规则中的特征不在数据集里，跳过此约束
+                # If the feature in the rule is not in the dataset, skip this constraint
                 continue
             idx = feature_names.index(r_knob)
             dom = domains[idx]
 
-            # 判定该维是否枚举（包含字符串或非纯数字）
+            # Determine if the dimension is categorical (contains strings or non-numeric values)
             is_enum = any(isinstance(v, str) or not isinstance(v, (int, float)) for v in dom)
 
             try:
-                # 规则生成阶段对枚举维通常给的是“索引阈值”
+                # During rule generation, categorical dimensions are usually given as "index thresholds"
                 thr = int(threshold) if is_enum else float(threshold)
             except Exception:
                 return None
 
             if is_enum:
-                # 枚举按“索引阈值”裁剪（保持原域顺序）
+                # Enumerations are trimmed based on "index threshold" (preserving the original domain order)
                 if direction == 'L':
                     new_dom = [v for i, v in enumerate(dom) if i <= thr]
                 else:  # 'R'
                     new_dom = [v for i, v in enumerate(dom) if i > thr]
             else:
-                # 数值维按“数值阈值”裁剪（域本身是有限值集）
+                # Numerical dimensions are trimmed based on "numerical thresholds" (the domain itself is a finite set of values)
                 if direction == 'L':
                     new_dom = [v for v in dom if float(v) <= thr]
                 else:  # 'R'
@@ -308,77 +308,29 @@ class PromiseTuner:
 
         return domains
 
-    # def ei_guided_sampling_from_domain(self, value_domains, estimators, eta, max_iterations=1000,
-    #                                    stop_threshold=0.01):
-    #
-    #     kde_interval = 500  # 每多少次评估做一次 KDE
-    #     min_kde_points = 50  # 至少多少个点后再启用 KDE 判断
-    #     feature_names = self.config_manager.get_config_header()[:-1]
-    #     values, configs, best = [], [], float('-inf')
-    #
-    #     for i in range(max_iterations):
-    #
-    #         sampled_config = self.config_manager.sampling_configs(1, value_domains)[0]
-    #         x = self.preprocess_configs_with_knobs_info([sampled_config])[0]
-    #         preds = [e.predict([x])[0] for e in estimators]
-    #         mean = np.mean(preds)
-    #         std = np.std(preds)
-    #         if self.config_manager.optimization_goal == 'minimum':  # minimization
-    #             z = (eta - mean) / std if std > 0 else 0
-    #             ei = (eta - mean) * norm.cdf(z) + std * norm.pdf(z) if std > 0 else 0
-    #         else:  # throughput: maximization
-    #             z = (mean - eta) / std if std > 0 else 0
-    #             ei = (mean - eta) * norm.cdf(z) + std * norm.pdf(z) if std > 0 else 0
-    #
-    #         values.append(ei)
-    #         configs.append(sampled_config)
-    #         best = max(best, ei)
-    #
-    #         # if i > 0:  # kde requires at least two points
-    #         #     try:
-    #         #         kde = stats.gaussian_kde(values)
-    #         #         if 1 - kde.integrate_box_1d(-np.inf, best) < stop_threshold:
-    #         #             break
-    #         #     except Exception as e:
-    #         #         break
-    #
-    #         # ---- 只在满足两个条件时才做 KDE 检查 ----
-    #         # 1) 样本数量 >= min_kde_points
-    #         # 2) 当前迭代索引满足间隔（例如每 500 次）
-    #         if i >= min_kde_points and ((i + 1) % kde_interval == 0):
-    #             try:
-    #                 v = np.array(values)
-    #                 kde = stats.gaussian_kde(v)
-    #                 tail_mass = 1 - kde.integrate_box_1d(-np.inf, best)
-    #                 if tail_mass < stop_threshold:
-    #                     break
-    #             except Exception:
-    #                 # KDE 偶尔会数值不稳定，直接忽略错误，继续搜索
-    #                 pass
-    #
-    #     return configs, best
+
 
     def ei_guided_sampling_from_domain(self, value_domains, estimators, eta, n_samples=1000):
         """
         Sample a batch of configurations from the given domain, compute EI in batch,
         and return only the single best candidate.
         """
-        # 1. 一次性采样
+        # 1. one shot sampling
         sampled_configs = self.config_manager.sampling_configs(n_samples, value_domains)
         if not sampled_configs:
             return None, None
 
-        # 2. 批量预处理
+        # 2. preprocess a batch of configs for prediction: shape = (n_samples, n_features)
         X = self.preprocess_configs_with_knobs_info(sampled_configs)
 
-        # 3. 批量预测：shape = (n_samples, n_estimators)
+        # 3. batch prediction：shape = (n_samples, n_estimators)
         preds = np.array([e.predict(X) for e in estimators]).T
 
         mean = preds.mean(axis=1)
         std = preds.std(axis=1)
-        std[std == 0] = 1e-8  # 防止除零
+        std[std == 0] = 1e-8  # avoid division by zero in EI calculation
 
-        # 4. 批量计算 EI
+        # 4. calculate EI for each candidate in batch
         if self.config_manager.optimization_goal == 'minimum':
             z = (eta - mean) / std
             ei = (eta - mean) * norm.cdf(z) + std * norm.pdf(z)
@@ -386,7 +338,7 @@ class PromiseTuner:
             z = (mean - eta) / std
             ei = (mean - eta) * norm.cdf(z) + std * norm.pdf(z)
 
-        # 5. 只取 EI 最好的那个
+        # 5. only get the single best candidate based on EI
         best_idx = np.argmax(ei)
         best_config = sampled_configs[best_idx]
         best_ei = ei[best_idx]
@@ -474,19 +426,19 @@ class PromiseTuner:
 
             covered_mean = np.mean(y_arr[covered_idx])
 
-            # minimization: covered_mean 越小越好
-            # maximization: covered_mean 越大越好
+            # minimization: covered_mean  smaller is better;
+            # maximization: covered_mean bigger is better.
             if self.config_manager.optimization_goal == 'minimum':
                 improvement = global_mean - covered_mean
             else:
                 improvement = covered_mean - global_mean
 
-            # 一个简单分数：改进幅度 * 支持度权重
+            # a simple scoring function that combines improvement and support (with log scaling)
             score = improvement * np.log1p(support)
 
             scored.append((score, support, rule))
 
-        # 分数高的在前
+        # according to the score (improvement * log(support)) to filter rules, and keep top_k
         scored.sort(key=lambda x: x[0], reverse=True)
 
         filtered_rules = [rule for _, _, rule in scored[:top_k]]

@@ -6,8 +6,6 @@ import numpy as np
 
 class EZRPoolTuner:
     """
-    A pool-based EZR tuner, implemented to more closely match the original EZR optimization logic.
-
     Core logic:
     - Warm-start with a small number of randomly evaluated configs from config_space.
     - Maintain two groups: Best and Rest.

@@ -17,14 +17,6 @@ import json
 from sklearn.tree import DecisionTreeRegressor, _tree
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import mutual_info_regression
-# try:
-#     from imblearn.over_sampling import SMOTE
-#     _HAS_SMOTE = True
-# except Exception:
-#     _HAS_SMOTE = False
-
-
-
 
 
 class ConfigManager:
@@ -59,7 +51,6 @@ class ConfigManager:
         self.tabpfn_python = os.path.join(".venv_tabpfn", "bin", "python")
         self.tabpfn_cache_dir = os.path.join("cache", "tabpfn")
 
-
         # --- DaL components ---
         self.dal_enabled = False
         self.dal_depth = None
@@ -72,7 +63,6 @@ class ConfigManager:
         self.dal_feature_weights = None  # optional MI weights for routing
         self.dal_scaler_maxX = None  # optional scaling like DaL
         self.dal_scaler_maxY = None
-
 
     def init_config_space(self):
         system_path = os.path.join("datasets", self.system)
@@ -117,7 +107,6 @@ class ConfigManager:
         self.init_fallback_registry()
         self.reset_dal()
         self.fit_dal_rf(depth=5, min_samples=10, seed=0, use_mi_weight=True)
-
 
     def precompute_worst_perf(self):
         perf_values = self.data_df.iloc[:, -1]
@@ -218,54 +207,20 @@ class ConfigManager:
         self.encoded_configs = self.encoder.fit_transform(str_configs)  # shape: (n_samples, n_features)
         self.balltree = BallTree(self.encoded_configs, metric='hamming')
 
-    # def evaluate(self, config_list: List[List[float]], fallback='worst', alive=None):
-    #     if self.data_df is None or self.config_perf_dict is None:
-    #         raise RuntimeError("Workload not set or config dict not built.")
-    #
-    #     results = []
-    #     for config in config_list:
-    #         key = tuple(config)
-    #         if key in self.config_perf_dict:
-    #             perf = self.config_perf_dict[key]
-    #
-    #             # # also return indices if needed, checking dataset manually
-    #             # return_all_indices = False
-    #             # idx_list = self.config_idx_dict.get(key, [])
-    #             # index_info = idx_list if return_all_indices else (idx_list[0] if idx_list else None)
-    #         elif fallback == '1NN':
-    #             nearest_cfg = self.find_nearest_by_mixed_distance(config)
-    #             perf = self.config_perf_dict[nearest_cfg]
-    #         elif fallback == 'kNN':
-    #             perf = self.knn_predict_perf(config, k=20, weighted=False)
-    #         elif fallback == 'kNNw':
-    #             perf = self.knn_predict_perf(config, k=20, weighted=True)
-    #         elif fallback == 'worst':
-    #             perf = self.worst_perf + np.random.uniform(0.001, 0.009)
-    #         else:
-    #             raise ValueError(f"Unknown fallback strategy: {fallback}")
-    #         results.append((config, perf))
-    #         alive -= 1
-    #
-    #         if alive is not None and alive <= 0:
-    #             break
-    #
-    #     return results, alive
-
     def evaluate(self, config_list: List[List[float]], fallback='worst', alive=None,
                  knn_k: int = 200, knn_weighted: bool = False,
                  kernel: str = 'tricube', bandwidth=None, ridge: float = 1e-8, lam: float = 1.0):
         """
-        fallback 选项：
-          - 'worst'      最差性能+微扰
-          - '1NN'        单近邻
-          - 'kNN'        k 近邻均值（k=knn_k）
-          - 'kNNw'       k 近邻距离加权均值
-          - 'loess'      局部线性回归（核加权）
+        fallback options：
+          - 'worst'      worst observed performance + small random noise (0.001~0.009) to break ties
+          - '1NN'        nearest neighbor performance
+          - 'kNN'        average of k nearest neighbors
+          - 'kNNw'       weighted average of k nearest neighbors (weight=1/(distance+eps))
+          - 'loess'      local regression (kernel-weighted linear regression in the neighborhood)
         """
         if self.data_df is None or self.config_perf_dict is None:
             raise RuntimeError("Workload not set or config dict not built.")
 
-        # 确保注册表存在
         if not hasattr(self, 'fallback_registry'):
             self.init_fallback_registry()
 
@@ -388,20 +343,19 @@ class ConfigManager:
                 return float(np.mean(perfs))
             return float(np.dot(perfs, weights) / wsum)
 
-
     def _kernel_weights(self, dists, bandwidth=None, kernel='tricube', eps=1e-12):
         dists = np.asarray(dists, dtype=float)
         if bandwidth is None:
-            # 自适应带宽：用最大距离（或分位数）做归一化
+            # adaptive bandwidth: normalize by max distance (or a quantile)
             bandwidth = np.max(dists) + eps
         u = dists / max(bandwidth, eps)
         if kernel == 'tricube':
-            w = np.where(u < 1.0, (1 - u**3)**3, 0.0)
+            w = np.where(u < 1.0, (1 - u ** 3) ** 3, 0.0)
         elif kernel == 'gaussian':
-            w = np.exp(-0.5 * (u**2))
+            w = np.exp(-0.5 * (u ** 2))
         else:
             raise ValueError(f"Unknown kernel: {kernel}")
-        # 保证至少有一点权重
+        # make sure weights are non-negative and not all zero
         if np.all(w == 0):
             w = np.ones_like(w)
         return w
@@ -419,11 +373,11 @@ class ConfigManager:
 
     def local_regression_predict(self, config, k=None, kernel='tricube', bandwidth=None, ridge=1e-8):
         """
-        Loess/局部线性：在邻域内做带权线性回归并预测目标点性能。
-        - k: 近邻个数
+        Loess: weighted local regression. Fit a linear model in the neighborhood of the target point, using kernel weights.
+        - k: No. of neighbors
         - kernel: 'tricube' | 'gaussian'
-        - bandwidth: 距离带宽（None=使用最大距离自适应）
-        - ridge: 岭系数，改善病态矩阵
+        - bandwidth: distance bandwidth for kernel weighting (if None, use max distance among neighbors for adaptive bandwidth)
+        - ridge: regularization strength for ridge regression (default: 1e-8)
         """
         if k is None:
             k = self.get_default_loess_k(factor=10, k_min=50)
@@ -439,15 +393,13 @@ class ConfigManager:
         X = self._design_matrix_from_configs(cfgs)
         x0 = self._design_vector_from_config(config)
 
-        # 权重（核）
         w = self._kernel_weights(d, bandwidth=bandwidth, kernel=kernel)
         W_sqrt = np.sqrt(w + 1e-12)
 
-        # 加权回归：解 (X^T W X + λI)β = X^T W y
+        # weighted regression (X^T W X + λI)β = X^T W y
         Xw = X * W_sqrt[:, None]
         yw = y * W_sqrt
 
-        # 岭正则
         XtX = Xw.T @ Xw
         if ridge > 0:
             XtX = XtX + ridge * np.eye(XtX.shape[0], dtype=float)
@@ -461,13 +413,10 @@ class ConfigManager:
             print("beta norm:", np.linalg.norm(beta))
 
         except np.linalg.LinAlgError:
-            # 退化时回退到 kNN 均值
+            # fallback to kNN mean if regression fails (e.g. singular matrix)
             yhat = float(np.mean(y))
         return yhat
 
-
-
-    # ---------------- Random Forest surrogate ----------------
     def fit_random_forest(self, n_estimators=300, random_state=0, n_jobs=-1, **kwargs):
         X, y = self._get_surrogate_train_data()
         self.rf_model = RandomForestRegressor(
@@ -478,8 +427,6 @@ class ConfigManager:
         )
         self.rf_model.fit(X, y)
 
-
-
     def predict_rf(self, cfg, auto_fit=True):
         if self.rf_model is None:
             if not auto_fit:
@@ -487,7 +434,6 @@ class ConfigManager:
             self.fit_random_forest()
         x = self._featurize_one(cfg).reshape(1, -1)
         return float(self.rf_model.predict(x)[0])
-
 
     def predict_rf_mean_std(self, cfg, auto_fit=True):
         """
@@ -519,9 +465,9 @@ class ConfigManager:
         else:
             raise ValueError(f"Unknown optimization goal: {self.optimization_goal}")
 
-    # ---------------- Gaussian Process surrogate ----------------
+
     def fit_gaussian_process(self, max_train=20000, random_state=0, **kwargs):
-        # 考虑到GP 复杂度，需要自采样数据集？我们只需要训练一次，数据量大应该也不是问题
+
         X, y = self._get_surrogate_train_data()
 
         # Subsample to avoid O(n^3) blowup
@@ -635,29 +581,21 @@ class ConfigManager:
         return float(self.hgb_model.predict(x)[0])
 
     # ---------------- TabPFN surrogate ----------------
-
     def predict_tabpfn_subprocess(self, cfg, max_train=20000, device="cpu", seed=0, ignore_limits=True):
         """
-        在独立 venv 中调用 TabPFN 预测。不会污染当前环境依赖。
+        independent subprocess call to TabPFN predictor, to avoid dependency issues and environment pollution.
         """
         if self.data_df is None:
             raise RuntimeError("Workload not set (call set_system_scale first).")
 
-        # scale csv 的真实路径
-        # 你 set_system_scale 用的是 datasets/<system>/<scales>.csv
-        # 这里用同样路径
-        # 如果你在 set_system_scale 里保存了 path，直接用 self.current_csv_path 更好
-        # 这里简单复用：
-        # 你可以在 set_system_scale 里加：self.current_csv_path = path
         csv_path = getattr(self, "current_csv_path", None)
         if csv_path is None:
-            # fallback：推断路径（不推荐，但可用）
             raise RuntimeError("current_csv_path not found. Set self.current_csv_path in set_system_scale().")
 
         py = self.tabpfn_python
         script = os.path.join("tools", "tabpfn_service.py")
 
-        # cfg 用逗号拼接（确保与你数据里不会含逗号）
+        # cfg is connected by comma, making sure it won't contain comma in the values (e.g. categorical values should not have comma)
         cfg_str = json.dumps([self.to_str_clean(v) for v in cfg])
 
         cmd = [
@@ -725,7 +663,6 @@ class ConfigManager:
         if self.data_df is None:
             raise RuntimeError("Call set_system_scale() before fit_dal_rf().")
 
-        # 清空旧状态，避免残留
         self.reset_dal()
 
         X, y, _ = self._get_full_Xy()
@@ -752,7 +689,7 @@ class ConfigManager:
         )
 
         if len(clusters) <= 1:
-            # division失败：直接不启用DaL
+            # division failed: disable DaL and fallback to global RF
             self.reset_dal()
             return
 
@@ -786,7 +723,7 @@ class ConfigManager:
             Xc = Xs[idx_list]
             yc = ys[idx_list]
 
-            # 如果某个 division 太小，局部RF会很不稳：直接跳过（预测时回退global RF）
+            # if division is too small, local RF will be unstable: skip and fallback to global RF during prediction
             if len(idx_list) < max(5, min_samples):
                 continue
 
@@ -807,11 +744,7 @@ class ConfigManager:
         self.dal_enabled = True
 
     def _dal_fit_scalers(self, X: np.ndarray, y: np.ndarray):
-        """
-        DaL 原作者风格 scaling:
-          X_scaled = X / max_X
-          y_scaled = y / max_Y   (max_Y = max(y)/100)
-        """
+
         max_X = np.amax(X, axis=0)
         max_X = np.where(max_X == 0, 1.0, max_X)
 
@@ -842,13 +775,9 @@ class ConfigManager:
         Predict with RF-only DaL. If router is uncertain / missing local model -> fallback to global RF.
         """
 
-
-
-        # DaL 不可用就回退
+        # guard: if DaL not properly set up, fallback to global RF
         if (not self.dal_enabled) or (self.dal_router is None) or (not self.dal_local_models):
             return self.predict_rf(cfg, auto_fit=True)
-
-
 
         x = self._design_vector_from_config(cfg).reshape(1, -1)
         xs = self._dal_transform_X(x)
@@ -897,24 +826,21 @@ class ConfigManager:
             ),
             'dal_rf': lambda cfg, **kw: self.dal_predict_rf(cfg),
 
-
         }
-
-
 
     def _design_matrix_from_configs(self, configs):
         """
-        将原始配置列表转为数值特征矩阵：
-        - 数值型: 直接转 float（可按需归一化）
-        - 分类型: 基于 self.encoder.categories_ 做 one-hot（drop_first=True 以规避多重共线）
-        返回: X (n_samples, n_features_expanded)
-        """
+    Convert the original configuration list into a numerical feature matrix:
+    - Numerical: Directly convert to float (normalize if needed)
+    - Categorical: Perform one-hot encoding based on self.encoder.categories_ (drop_first=True to avoid multicollinearity)
+    Returns: X (n_samples, n_features_expanded)
+    """
         if self.encoder is None or not hasattr(self.encoder, 'categories_'):
-            # 编码器在 build_balltree() 已经 fit 了
+            # The encoder has already been fitted in build_balltree()
             raise RuntimeError("Encoder not initialized. Ensure build_balltree() has been called.")
 
         X = []
-        # 预取每个分类特征的类别列表
+        # Pre-fetch the list of categories for each categorical feature
         cat_lists = [list(cats) for cats in self.encoder.categories_]
 
         for cfg in configs:
@@ -923,17 +849,17 @@ class ConfigManager:
                 if self.feature_types[j] == "numerical":
                     row.append(float(val))
                 else:
-                    # 分类型 -> one-hot
+                   # Categorical -> one-hot
                     sval = self.to_str_clean(val)
                     cats = cat_lists[j]
-                    # drop_first: 只编码从 index=1 开始的类别
+                    # drop_first: only encode categories starting from index=1
                     for idx in range(1, len(cats)):
                         row.append(1.0 if sval == cats[idx] else 0.0)
             X.append(row)
         return np.asarray(X, dtype=float)
 
     def _design_vector_from_config(self, cfg):
-        """与 _design_matrix_from_configs 同逻辑，单样本版本; 对需要预测的配置转换"""
+        """Same logic as _design_matrix_from_configs, single-sample version; transforms the configuration to be predicted"""
         if self.encoder is None or not hasattr(self.encoder, 'categories_'):
             raise RuntimeError("Encoder not initialized.")
         row = []
@@ -967,7 +893,7 @@ class ConfigManager:
         return self._design_vector_from_config(cfg)
 
     def _get_full_Xy(self):
-        # 全表 configs（来自已经读入的 data_df）
+      # Full table configs (from the already loaded data_df)
         cfgs = [list(row[:-1]) for row in self.data_df.values]
         y = np.asarray([row[-1] for row in self.data_df.values], dtype=float)
         X = self._design_matrix_from_configs(cfgs)
@@ -993,7 +919,3 @@ class ConfigManager:
         self.gp_y_scaler = None
         self.dt_model = None
         self.hgb_model = None
-
-
-
-

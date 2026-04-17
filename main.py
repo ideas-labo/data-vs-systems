@@ -91,33 +91,30 @@ def main():
     budgets = {'mysql': 350, 'postgresql': 350, 'httpd': 250, 'tomcat': 250, 'gcc': 350, 'clang': 350, 'x264': 200, 'x265':200}
     runs = 10
     systems = ['mysql', 'postgresql', 'httpd', 'tomcat', 'gcc', 'clang', 'x264', 'x265']
-    # compared_algorithms = ['flash', 'ga', 'smac', 'hebo', 'bestconfig']
+    compared_algorithms = ['flash', 'ga', 'smac', 'hebo', 'bestconfig','promisetune', 'random_search']
     # compared_algorithms = ['flash_pool', 'random_search_pool', 'ezr_pool', 'line_pool']
-    compared_algorithms = ['promisetune']
+
     
 
-    # fall back strategies; gp 跟 dt 可以去掉；加sota; 算法方面加一下 pool-based 跟 query-based 的 baseline；
-    # fallbacks = ['rf_uncertainty', 'gp', 'rf', 'loess', 'hgb', 'dal_rf']
-    fallbacks = ['1NN']
+    # fall back strategies
+    fallbacks = ['worst', '1NN', 'kNN', 'kNNw', 'loess', 'rf', 'dal_rf', 'rf_uncertainty']
+
 
     global_start = time.time()
 
-    # 线程数
     max_workers = runs
-
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         futures = []
         for fallback in fallbacks:
             for i in range(runs):
-                # 每个 (fallback, i) 提交成一个独立任务
+                # for each (fallback, i), submit a separate task to the executor
                 futures.append(
                     executor.submit(run_one_experiment, fallback, i, budgets, systems, compared_algorithms)
                 )
 
-        # 等所有任务完成（可以顺便打印一下谁先完成）
         for fut in as_completed(futures):
             try:
-                fut.result()  # 捕获异常（如果某个线程里抛错误，这里能及时看到）
+                fut.result()
             except Exception as e:
                 print(f"[ERROR] One run failed with error: {e}")
 

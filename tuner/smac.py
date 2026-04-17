@@ -61,29 +61,29 @@ class SMACTuner:
     #     return cs
 
     def _normalize_domain_vals(self, domain):
-        # 去掉 None，并把 numpy 标量转成原生
+        # Remove None values and convert numpy scalars to native types
         vals = [self.to_py_scalar(v) for v in domain if v is not None]
         if not vals:
             raise ValueError("Empty value domain for a knob.")
         return vals
 
     def _is_all_bool(self, vals):
-        # bool 是 int 的子类，必须优先判定
+        # bool is a subclass of int, so it must be checked first
         return all(isinstance(v, bool) for v in vals)
 
     def _is_all_int(self, vals):
-        # 允许纯整数；排除 bool
+       # Allow pure integers; exclude bool
         return all(isinstance(v, int) and not isinstance(v, bool) for v in vals)
 
     def _is_all_float_like(self, vals):
-        # 只要出现 float（或混合 int+float），视为连续浮点
-        # 排除 bool
+        # As long as a float (or mixed int+float) appears, treat it as continuous float
+        # Exclude bool
         return all((isinstance(v, (int, float)) and not isinstance(v, bool)) for v in vals) \
             and any(isinstance(v, float) for v in vals)
 
     def get_configspace(self):
         """
-        连续/整数 -> UniformFloat/UniformInteger；字符串/布尔/混合 -> Categorical
+        Continuous/Integer -> UniformFloat/UniformInteger; String/Boolean/Mixed -> Categorical
         """
         cs = ConfigurationSpace()
 
@@ -95,24 +95,24 @@ class SMACTuner:
             vals = self._normalize_domain_vals(domain)
             uniq = sorted(set(vals), key=lambda x: (str(type(x)), x))
 
-            # 1) 纯布尔：枚举（通常就是 [False, True]）
+            # 1) Pure boolean: Categorical (usually [False, True])
             if self._is_all_bool(vals):
                 cs.add_hyperparameter(CategoricalHyperparameter(name, sorted(set(vals))))
                 continue
 
-            # 2) 纯整数且不全相等 -> 区间整数
+           # 2) Pure integers and not all equal -> Integer range
             if self._is_all_int(vals) and len(uniq) > 1:
                 lo, hi = int(min(vals)), int(max(vals))
                 cs.add_hyperparameter(UniformIntegerHyperparameter(name, lo, hi))
                 continue
 
-            # 3) 浮点型（或 int+float 混合）且不全相等 -> 区间浮点
+            # 3) Float type (or int+float mixed) and not all equal -> Continuous float range
             if self._is_all_float_like(vals) and (min(vals) != max(vals)):
                 lo, hi = float(min(vals)), float(max(vals))
                 cs.add_hyperparameter(UniformFloatHyperparameter(name, lo, hi))
                 continue
 
-            # 4) 其他情况（字符串、混合类型、只有一个取值等） -> 枚举
+            # 4) Other cases (strings, mixed types, only one value, etc.) -> Enumeration
             cs.add_hyperparameter(CategoricalHyperparameter(name, uniq))
 
         return cs
