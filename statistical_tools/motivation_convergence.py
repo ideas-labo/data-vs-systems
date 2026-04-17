@@ -1,41 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-Flexible convergence plotting script for motivation figures.
-
-Features
---------
-- Plot one figure per fallback strategy
-- Each figure can contain any number of algorithms
-- Per-run trajectories are first converted to monotonic best-so-far curves
-- Then aggregated across runs by mean/std
-- Save figures to statistical_tools/motivation/
-
-Expected directory structure
-----------------------------
-results/
-├── run0/
-│   ├── 1NN/
-│   │   ├── bestconfig/postgresql/postgresql_large/all_results.csv
-│   │   ├── smac/postgresql/postgresql_large/all_results.csv
-│   │   └── ...
-│   ├── rf/
-│   │   ├── bestconfig/postgresql/postgresql_large/all_results.csv
-│   │   ├── smac/postgresql/postgresql_large/all_results.csv
-│   │   └── ...
-│   └── ...
-├── run1/
-...
-└── run9/
-
-Notes
------
-- This script assumes the performance column is the LAST column of all_results.csv
-- For maximization tasks, convergence is cumulative max
-- For minimization tasks, convergence is cumulative min
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -43,114 +8,135 @@ from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 
 # ============================================================
-# 1. User configuration: modify only this section when needed
+# 1. User configuration
 # ============================================================
 
-# ---- target system ----
-SYSTEM = "gcc"
-SYSTEM_SCALE = "gcc_small"
+SYSTEM = "postgresql"
+SYSTEM_SCALE = "postgresql_large"
 
-# ---- which fallbacks to plot ----
 FALLBACKS = [
     "1NN",
-    "kNN",
-    "kNNw",
-    "loess",
+    # "kNN",
+    # "kNNw",
+    # "loess",
     "rf",
-    "dal_rf",
-    "rf_uncertainty",
+    # "dal_rf",
+    # "rf_uncertainty",
+
 ]
 
-# ---- which algorithms to include in each figure ----
 ALGORITHMS = [
     "smac",
-    "bestconfig",
-    "flash",
-    "ga",
-    "hebo",
+    # "bestconfig",
+    # "flash",
+    # "ga",
+    # "hebo",
     "promisetune",
-    "random_search",
+    # "random_search",
 ]
 
-# ---- which runs to aggregate ----
 RUN_IDS = list(range(10))
-# 例如只看 run4:
-# RUN_IDS = [4]
-# 例如看前5次:
-# RUN_IDS = list(range(5))
-
-# ---- file name ----
 CSV_NAME = "all_results.csv"
 
-# ---- output ----
 OUTPUT_FOLDER_NAME = "motivation"
 
-# ---- figure style ----
-FIG_WIDTH = 7.2
-FIG_HEIGHT = 4.6
-DPI = 300
+# Whether to include markers in tex
+USE_MARKERS = False
 
-LINE_WIDTH = 2.2
-SHADE_ALPHA = 0.15
-GRID_ALPHA = 0.25
-LEGEND_FRAME = False
+# Sampling interval for exporting coordinates to tex
+# e.g., 10 means only export every 10th point, while always keeping the last point
+POINT_STEP = 10
 
-# If True, save std-shaded region; otherwise only draw mean curves
-SHOW_STD_BAND = True
+# Figure metadata
+X_LABEL = "\# measurement"
 
-# If True, save aggregated csv for every (fallback, algorithm)
-SAVE_AGGREGATED_CSV = True
+# Template axis style
+AXIS_WIDTH = "5cm"
+AXIS_HEIGHT = "5cm"
 
-# Optional pretty display names
-ALGORITHM_DISPLAY_NAMES = {
-    "smac": "SMAC",
-    "bestconfig": "BestConfig",
-    "flash": "FLASH",
-    "ga": "GA",
-    "hebo": "HEBO",
-    "promisetune": "PromiseTune",
-    "random_search": "Random Search",
+# If None, compute automatically from data
+XMIN = None
+XMAX = None
+YMIN = None
+YMAX = None
+
+# Optional manual ticks
+XTICK = None   # e.g. "{1,50,100,150,200,250,300,350}"
+YTICK = None   # e.g. "{2500,2800,3100,3400,3700,4000}"
+
+# Legend position copied from your template
+LEGEND_AT = "(0.98,0.9)"
+LEGEND_ANCHOR = "south east"
+
+# Style map
+STYLE_MAP = {
+    "bestconfig": {
+        "color": "red",
+        "fill": "red!70",
+        "line_width": "ultra thick",
+        "line_style": "dashdotted",
+        "marker": "square",
+        "marker_options": "thick,solid",
+        "legend": r"\texttt{BestConfig}",
+    },
+    "smac": {
+        "color": "teal",
+        "fill": "teal!30",
+        "line_width": "ultra thick",
+        "line_style": "dashed",
+        "marker": "o",
+        "marker_options": "thick",
+        "legend": r"\texttt{SMAC}",
+    },
+    "flash": {
+        "color": "blue",
+        "fill": "blue!30",
+        "line_width": "ultra thick",
+        "line_style": "dotted",
+        "marker": "triangle",
+        "marker_options": "thick,solid",
+        "legend": r"\texttt{FLASH}",
+    },
+    "promisetune": {
+        "color": "orange",
+        "fill": "orange!30",
+        "line_width": "ultra thick",
+        "line_style": "solid",
+        "marker": "square",
+        "marker_options": "thick,solid",
+        "legend": r"\texttt{PromiseTune}",
+    },
+    "hebo": {
+        "color": "purple",
+        "fill": "purple!30",
+        "line_width": "ultra thick",
+        "line_style": "densely dashed",
+        "marker": "diamond",
+        "marker_options": "thick,solid",
+        "legend": r"\texttt{HEBO}",
+    },
+    "ga": {
+        "color": "magenta",
+        "fill": "magenta!30",
+        "line_width": "ultra thick",
+        "line_style": "densely dotted",
+        "marker": "asterisk",
+        "marker_options": "thick,solid",
+        "legend": r"\texttt{GA}",
+    },
+    "random_search": {
+        "color": "black",
+        "fill": "black!20",
+        "line_width": "ultra thick",
+        "line_style": "loosely dashed",
+        "marker": "x",
+        "marker_options": "thick,solid",
+        "legend": r"\texttt{RandomSearch}",
+    },
 }
-
-FALLBACK_DISPLAY_NAMES = {
-    "1NN": "1NN",
-    "rf": "RF",
-    "kNN": "kNN",
-    "kNNw": "kNNw",
-    "loess": "LOESS",
-    "worst": "Worst",
-    "dal_rf": "DAL-RF",
-    "rf_uncertainty": "RF-Uncertainty",
-}
-
-# Optional line styles per algorithm
-ALGORITHM_LINESTYLES = {
-    "smac": "-",
-    "bestconfig": "--",
-    "flash": "-.",
-    "ga": ":",
-    "hebo": (0, (5, 1)),
-    "promisetune": (0, (3, 1, 1, 1)),
-    "random_search": (0, (1, 1)),
-}
-
-# Optional markers per algorithm (set to None to disable)
-ALGORITHM_MARKERS = {
-    "smac": None,
-    "bestconfig": None,
-    "flash": None,
-    "ga": None,
-    "hebo": None,
-    "promisetune": None,
-    "random_search": None,
-}
-
-# Plot title usage
-USE_TITLE = True
 
 
 # ============================================================
@@ -164,38 +150,23 @@ OUTPUT_DIR = SCRIPT_DIR / OUTPUT_FOLDER_NAME
 
 
 # ============================================================
-# 3. Utility functions
+# 3. Helpers
 # ============================================================
 
 def is_maximize(system: str) -> bool:
-    """
-    Return True if the system is a maximization problem.
-    mysql / postgresql / tomcat / httpd are maximization.
-    Others are minimization.
-    """
-    maximize_systems = {
-        "mysql",
-        "postgresql",
-        "tomcat",
-        "httpd",
-    }
-    return system.lower() in maximize_systems
-
-
-def get_display_name(name: str, mapping: Dict[str, str]) -> str:
-    return mapping.get(name, name)
+    return system.lower() in {"mysql", "postgresql", "tomcat", "httpd"}
 
 
 def get_ylabel(system: str) -> str:
-    if is_maximize(system):
-        return "Best-so-far performance (higher is better)"
-    return "Best-so-far performance (lower is better)"
+    s = system.lower()
+    if s in {"mysql", "postgresql"}:
+        return "Throughput (tps)"
+    if s in {"httpd", "tomcat"}:
+        return "Throughput (rps)"
+    return "Runtime (s)"
 
 
-def read_performance_curve(csv_path: Path) -> Optional[np.ndarray]:
-    """
-    Read the last column of csv as performance values.
-    """
+def read_curve(csv_path: Path) -> Optional[np.ndarray]:
     if not csv_path.exists():
         print(f"[WARN] Missing file: {csv_path}")
         return None
@@ -211,41 +182,27 @@ def read_performance_curve(csv_path: Path) -> Optional[np.ndarray]:
         return None
 
     perf = pd.to_numeric(df.iloc[:, -1], errors="coerce").dropna()
-    if perf.empty:
-        print(f"[WARN] No valid numeric performance values: {csv_path}")
+    vals = perf.to_numpy(dtype=float)
+    vals = vals[np.isfinite(vals)]
+
+    if len(vals) == 0:
+        print(f"[WARN] No finite values in: {csv_path}")
         return None
 
-    values = perf.to_numpy(dtype=float)
-    values = values[np.isfinite(values)]
-
-    if len(values) == 0:
-        print(f"[WARN] No finite performance values: {csv_path}")
-        return None
-
-    return values
+    return vals
 
 
-def make_monotonic_curve(values: np.ndarray, maximize: bool = True) -> np.ndarray:
-    """
-    Convert raw performance curve into best-so-far curve.
-    """
+def make_monotonic(values: np.ndarray, maximize: bool) -> np.ndarray:
     if maximize:
         return np.maximum.accumulate(values)
     return np.minimum.accumulate(values)
 
 
-def collect_curves(
-    fallback: str,
-    algorithm: str,
-    run_ids: List[int],
-) -> List[np.ndarray]:
-    """
-    Collect monotonic curves across runs for one fallback and one algorithm.
-    """
+def collect_curves(fallback: str, algorithm: str) -> List[np.ndarray]:
     curves = []
     maximize = is_maximize(SYSTEM)
 
-    for run_id in run_ids:
+    for run_id in RUN_IDS:
         csv_path = (
             RESULTS_DIR
             / f"run{run_id}"
@@ -255,185 +212,262 @@ def collect_curves(
             / SYSTEM_SCALE
             / CSV_NAME
         )
-
-        values = read_performance_curve(csv_path)
-        if values is None:
+        vals = read_curve(csv_path)
+        if vals is None:
             continue
-
-        mono = make_monotonic_curve(values, maximize=maximize)
-        curves.append(mono)
+        curves.append(make_monotonic(vals, maximize=maximize))
 
     return curves
 
 
-def pad_curves_with_last_value(curves: List[np.ndarray]) -> np.ndarray:
-    """
-    Pad all curves to the same length using their last value.
-    This preserves the best-so-far semantics.
-    """
-    if not curves:
-        raise ValueError("curves is empty")
-
-    max_len = max(len(curve) for curve in curves)
-    padded = []
-
-    for curve in curves:
-        if len(curve) < max_len:
-            extra = np.full(max_len - len(curve), curve[-1], dtype=float)
-            curve = np.concatenate([curve, extra])
-        padded.append(curve)
-
-    return np.vstack(padded)
+def pad_with_last(curves: List[np.ndarray]) -> np.ndarray:
+    max_len = max(len(c) for c in curves)
+    out = []
+    for c in curves:
+        if len(c) < max_len:
+            c = np.concatenate([c, np.full(max_len - len(c), c[-1])])
+        out.append(c)
+    return np.vstack(out)
 
 
-def aggregate_curves(curves: List[np.ndarray]) -> Dict[str, np.ndarray]:
-    """
-    Aggregate multiple curves into x / mean / std.
-    """
-    arr = pad_curves_with_last_value(curves)
-    x = np.arange(1, arr.shape[1] + 1)
+def aggregate(curves: List[np.ndarray]) -> Dict[str, np.ndarray]:
+    arr = pad_with_last(curves)
     mean = arr.mean(axis=0)
     std = arr.std(axis=0)
-
+    x = np.arange(1, len(mean) + 1, dtype=float)
     return {
         "x": x,
         "mean": mean,
-        "std": std,
-        "all": arr,
+        "upper": mean + std,
+        "lower": mean - std,
     }
 
 
-def ensure_output_dir() -> None:
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+def downsample_series(x: np.ndarray, y: np.ndarray, step: int) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Keep every `step`-th point and always keep the last point.
+    """
+    if step <= 1 or len(x) <= 2:
+        return x, y
+
+    idx = list(range(0, len(x), step))
+    if idx[-1] != len(x) - 1:
+        idx.append(len(x) - 1)
+
+    idx = np.array(idx, dtype=int)
+    return x[idx], y[idx]
 
 
-def save_aggregated_csv(
-    fallback: str,
-    algorithm: str,
-    stats: Dict[str, np.ndarray],
-) -> None:
-    if not SAVE_AGGREGATED_CSV:
+def fmt_coords(x: np.ndarray, y: np.ndarray, digits: int = 4) -> str:
+    return " ".join(f"({xx:.{digits}f}, {yy:.{digits}f})" for xx, yy in zip(x, y))
+
+
+def compute_limits(all_stats: Dict[str, Dict[str, np.ndarray]]) -> Dict[str, float]:
+    xs = []
+    ys = []
+
+    for s in all_stats.values():
+        xs.extend(s["x"].tolist())
+        ys.extend(s["upper"].tolist())
+        ys.extend(s["lower"].tolist())
+
+    xmin = min(xs)
+    xmax = max(xs)
+    ymin = min(ys)
+    ymax = max(ys)
+
+    margin = 0.05 * (ymax - ymin) if ymax > ymin else 0.01
+    return {
+        "xmin": xmin if XMIN is None else XMIN,
+        "xmax": xmax if XMAX is None else XMAX,
+        "ymin": ymin - margin if YMIN is None else YMIN,
+        "ymax": ymax + margin if YMAX is None else YMAX,
+    }
+
+
+def tex_plot_block(
+    mean_coords: str,
+    upper_coords: str,
+    lower_coords: str,
+    style: Dict[str, str],
+    upper_name: str,
+    lower_name: str,
+) -> str:
+    if USE_MARKERS:
+        mean_plot = rf"""
+\addplot[
+    {style['color']},
+    {style['line_style']},
+    mark={style['marker']},mark options={{{style['marker_options']}}},
+    {style['line_width']}, forget plot
+] coordinates {{
+{mean_coords}
+}}; 
+"""
+    else:
+        mean_plot = rf"""
+\addplot[
+    {style['color']},
+    {style['line_style']},
+    {style['line_width']}, forget plot
+] coordinates {{
+{mean_coords}
+}}; 
+"""
+
+    return (
+        mean_plot
+        + rf"""\addlegendentry{{{style['legend']}}}
+
+\addplot[
+name path={upper_name},
+draw=none, forget plot
+] coordinates {{
+{upper_coords}
+}}; 
+
+\addplot[
+name path={lower_name},
+draw=none, forget plot
+] coordinates {{
+{lower_coords}
+}}; 
+
+% ========= file shading =========
+\addplot[
+    {style['fill']},
+    fill opacity=0.30, forget plot
+] fill between[
+    of={upper_name} and {lower_name},
+];
+
+"""
+    )
+
+
+def export_one_tex(fallback: str, all_stats: Dict[str, Dict[str, np.ndarray]]) -> None:
+    if not all_stats:
+        print(f"[WARN] No valid stats for fallback={fallback}")
         return
 
-    out_csv = OUTPUT_DIR / f"aggregation_{fallback}_{algorithm}_{SYSTEM}_{SYSTEM_SCALE}.csv"
-    df = pd.DataFrame({
-        "evaluation": stats["x"],
-        "mean": stats["mean"],
-        "std": stats["std"],
-    })
-    df.to_csv(out_csv, index=False)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    limits = compute_limits(all_stats)
 
+    out_path = OUTPUT_DIR / f"motivation_{fallback}_{SYSTEM}_{SYSTEM_SCALE}.tex"
 
-def setup_matplotlib_style() -> None:
-    plt.rcParams["figure.figsize"] = (FIG_WIDTH, FIG_HEIGHT)
-    plt.rcParams["figure.dpi"] = DPI
-    plt.rcParams["savefig.dpi"] = DPI
-    plt.rcParams["font.size"] = 11
-    plt.rcParams["axes.labelsize"] = 11
-    plt.rcParams["axes.titlesize"] = 12
-    plt.rcParams["legend.fontsize"] = 10
-    plt.rcParams["xtick.labelsize"] = 10
-    plt.rcParams["ytick.labelsize"] = 10
+    body_blocks = []
+    legend_images = []
 
-
-def plot_one_fallback(fallback: str) -> None:
-    """
-    Plot all selected algorithms under one fallback.
-    """
-    plt.figure()
-    plotted_any = False
-
-    for algorithm in ALGORITHMS:
-        curves = collect_curves(
-            fallback=fallback,
-            algorithm=algorithm,
-            run_ids=RUN_IDS,
-        )
-
-        if len(curves) == 0:
-            print(f"[WARN] No valid runs for fallback={fallback}, algorithm={algorithm}")
+    for idx, algorithm in enumerate(ALGORITHMS):
+        if algorithm not in all_stats:
             continue
 
-        stats = aggregate_curves(curves)
-        save_aggregated_csv(fallback, algorithm, stats)
+        style = STYLE_MAP.get(algorithm)
+        if style is None:
+            print(f"[WARN] No style defined for {algorithm}, skipped.")
+            continue
 
-        x = stats["x"]
-        mean = stats["mean"]
-        std = stats["std"]
+        stats = all_stats[algorithm]
 
-        label = f"{get_display_name(algorithm, ALGORITHM_DISPLAY_NAMES)} (n={len(curves)})"
-        linestyle = ALGORITHM_LINESTYLES.get(algorithm, "-")
-        marker = ALGORITHM_MARKERS.get(algorithm, None)
+        x_mean, y_mean = downsample_series(stats["x"], stats["mean"], POINT_STEP)
+        x_upper, y_upper = downsample_series(stats["x"], stats["upper"], POINT_STEP)
+        x_lower, y_lower = downsample_series(stats["x"], stats["lower"], POINT_STEP)
 
-        plt.plot(
-            x,
-            mean,
-            label=label,
-            linewidth=LINE_WIDTH,
-            linestyle=linestyle,
-            marker=marker,
-            markevery=max(1, len(x) // 12) if marker is not None else None,
+        mean_coords = fmt_coords(x_mean, y_mean)
+        upper_coords = fmt_coords(x_upper, y_upper)
+        lower_coords = fmt_coords(x_lower, y_lower)
+
+        upper_name = f"upper{idx}"
+        lower_name = f"lower{idx}"
+
+        body_blocks.append(
+            tex_plot_block(
+                mean_coords=mean_coords,
+                upper_coords=upper_coords,
+                lower_coords=lower_coords,
+                style=style,
+                upper_name=upper_name,
+                lower_name=lower_name,
+            )
         )
 
-        if SHOW_STD_BAND:
-            plt.fill_between(
-                x,
-                mean - std,
-                mean + std,
-                alpha=SHADE_ALPHA,
+        if USE_MARKERS:
+            legend_images.append(
+                rf"\addlegendimage{{{style['color']}, {style['line_style']}, mark={style['marker']}, mark options={{{style['marker_options']}}}, {style['line_width']}}}"
             )
+        else:
+            legend_images.append(
+                rf"\addlegendimage{{{style['color']}, {style['line_style']}, {style['line_width']}}}"
+            )
+        legend_images.append(rf"\addlegendentry{{{style['legend']}}}")
 
-        plotted_any = True
+    xtick_line = f"      xtick={XTICK}," if XTICK is not None else ""
+    ytick_line = f"      ytick={YTICK}," if YTICK is not None else ""
 
-    if not plotted_any:
-        print(f"[WARN] Nothing plotted for fallback={fallback}")
-        plt.close()
-        return
+    tex = rf"""\documentclass{{standalone}}
+\usepackage{{pgfplots}}
+\pgfplotsset{{compat=1.18}}
+\usepgfplotslibrary{{fillbetween}}
 
-    plt.xlabel("Evaluation")
-    plt.ylabel(get_ylabel(SYSTEM))
+\begin{{document}}
+\begin{{tikzpicture}}
+    \begin{{axis}}[
+      axis x line  = bottom,
+      axis y line  = left,
+      width={AXIS_WIDTH}, height={AXIS_HEIGHT}, 
+      xlabel={{{X_LABEL}}},
+      ylabel={{{get_ylabel(SYSTEM)}}},
+      xmin={limits['xmin']:.4f}, xmax={limits['xmax']+20:.4f},
+      ymin={limits['ymin']:.4f}, ymax={limits['ymax']:.4f},
+{xtick_line}
+{ytick_line}
+      legend cell align=left,
+      legend columns=1,
+      legend style={{
+        draw=none, fill=none,
+        at={{{LEGEND_AT}}}, anchor={LEGEND_ANCHOR},
+        legend cell align=left
+      }}
+    ]
 
-    if USE_TITLE:
-        fallback_name = get_display_name(fallback, FALLBACK_DISPLAY_NAMES)
-        plt.title(f"{SYSTEM_SCALE} under {fallback_name}")
+{''.join(body_blocks)}
+{chr(10).join(legend_images)}
 
-    plt.grid(True, alpha=GRID_ALPHA)
-    plt.legend(frameon=LEGEND_FRAME)
-    plt.tight_layout()
+\end{{axis}}
+\end{{tikzpicture}}
+\end{{document}}
+"""
 
-    png_path = OUTPUT_DIR / f"convergence_{fallback}_{SYSTEM}_{SYSTEM_SCALE}.png"
-    pdf_path = OUTPUT_DIR / f"convergence_{fallback}_{SYSTEM}_{SYSTEM_SCALE}.pdf"
-
-    plt.savefig(png_path, bbox_inches="tight")
-    plt.savefig(pdf_path, bbox_inches="tight")
-    plt.close()
-
-    print(f"[OK] Saved: {png_path}")
-    print(f"[OK] Saved: {pdf_path}")
+    out_path.write_text(tex, encoding="utf-8")
+    print(f"[OK] Saved: {out_path}")
 
 
 def main() -> None:
-    setup_matplotlib_style()
-    ensure_output_dir()
-
-    print(f"[INFO] PROJECT_ROOT = {PROJECT_ROOT}")
-    print(f"[INFO] RESULTS_DIR  = {RESULTS_DIR}")
-    print(f"[INFO] OUTPUT_DIR   = {OUTPUT_DIR}")
-    print(f"[INFO] SYSTEM       = {SYSTEM}")
-    print(f"[INFO] SCALE        = {SYSTEM_SCALE}")
-    print(f"[INFO] OBJECTIVE    = {'maximize' if is_maximize(SYSTEM) else 'minimize'}")
-    print(f"[INFO] FALLBACKS    = {FALLBACKS}")
-    print(f"[INFO] ALGORITHMS   = {ALGORITHMS}")
-    print(f"[INFO] RUN_IDS      = {RUN_IDS}")
-
     if not RESULTS_DIR.exists():
         raise FileNotFoundError(f"Results directory not found: {RESULTS_DIR}")
 
-    for fallback in FALLBACKS:
-        print(f"\n[INFO] Plotting fallback: {fallback}")
-        plot_one_fallback(fallback)
+    print(f"[INFO] SYSTEM = {SYSTEM}")
+    print(f"[INFO] SYSTEM_SCALE = {SYSTEM_SCALE}")
+    print(f"[INFO] OBJECTIVE = {'maximize' if is_maximize(SYSTEM) else 'minimize'}")
+    print(f"[INFO] Y_LABEL = {get_ylabel(SYSTEM)}")
+    print(f"[INFO] FALLBACKS = {FALLBACKS}")
+    print(f"[INFO] ALGORITHMS = {ALGORITHMS}")
+    print(f"[INFO] RUN_IDS = {RUN_IDS}")
+    print(f"[INFO] POINT_STEP = {POINT_STEP}")
 
-    print("\n[DONE] Finished plotting all requested fallback figures.")
+    for fallback in FALLBACKS:
+        all_stats = {}
+
+        for algorithm in ALGORITHMS:
+            curves = collect_curves(fallback, algorithm)
+            if len(curves) == 0:
+                print(f"[WARN] No valid runs for fallback={fallback}, algorithm={algorithm}")
+                continue
+            all_stats[algorithm] = aggregate(curves)
+
+        export_one_tex(fallback, all_stats)
+
+    print("[DONE] All tex files have been generated.")
 
 
 if __name__ == "__main__":

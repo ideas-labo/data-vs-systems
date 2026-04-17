@@ -160,7 +160,7 @@ def main():
     estimations = ['1NN', 'kNN', 'kNNw', 'loess', 'rf', 'rf_uncertainty', 'dal_rf']
     systems = ['mysql', 'postgresql', 'httpd', 'tomcat', 'x264', 'x265']
 
-    gt_path = os.path.join("ground_truth.csv")
+    gt_path = os.path.join("../ground_truth.csv")
 
     for scale in scales:
         analyze_scale_consistency(
