@@ -1,0 +1,8 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+medium,clang_medium,flash,4,75.51 (4.90),9.56
+medium,clang_medium,ga,3,72.77 (5.21),7.27
+medium,clang_medium,smac,2,69.75 (2.37),2.98
+medium,clang_medium,hebo,3,75.17 (2.89),4.47
+medium,clang_medium,bestconfig,6,79.65 (2.01),2.78
+medium,clang_medium,promisetune,1,68.04 (3.65),3.98
+medium,clang_medium,random_search,5,78.66 (2.56),3.15

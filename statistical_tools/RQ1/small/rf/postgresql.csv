@@ -1,0 +1,8 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+small,postgresql_small,flash,5,412.43 (3.69),4.56
+small,postgresql_small,ga,4,419.35 (7.38),10.69
+small,postgresql_small,smac,2,422.70 (6.02),5.70
+small,postgresql_small,hebo,1,426.08 (10.58),10.03
+small,postgresql_small,bestconfig,7,385.85 (3.52),5.97
+small,postgresql_small,promisetune,3,420.87 (2.22),3.52
+small,postgresql_small,random_search,6,396.87 (6.35),3.14

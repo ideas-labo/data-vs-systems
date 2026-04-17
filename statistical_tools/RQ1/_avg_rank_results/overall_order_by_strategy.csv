@@ -1,0 +1,9 @@
+strategy,pos_1,pos_2,pos_3,pos_4,pos_5,pos_6,pos_7
+1NN,flash,ga,bestconfig,random_search,promisetune,smac,hebo
+kNN,hebo,smac,ga,flash,bestconfig,promisetune,random_search
+kNNw,hebo,ga,smac,flash,promisetune,bestconfig,random_search
+loess,smac,hebo,ga,promisetune,flash,random_search,bestconfig
+rf,hebo,smac,promisetune,flash,ga,random_search,bestconfig
+dal_rf,hebo,smac,promisetune,flash,ga,random_search,bestconfig
+rf_uncertainty,hebo,flash,smac,promisetune,ga,random_search,bestconfig
+worst,ga,hebo,smac,random_search,flash,bestconfig,promisetune

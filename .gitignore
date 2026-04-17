@@ -1,0 +1,82 @@
+# =========================
+# Python bytecode / cache
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =========================
+# Virtual environments
+# =========================
+.venv/
+venv/
+env/
+ENV/
+.venv_tabpfn/
+
+# =========================
+# Build / packaging
+# =========================
+build/
+dist/
+.eggs/
+*.egg-info/
+*.egg
+
+# =========================
+# Jupyter / notebook
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Test / coverage / cache
+# =========================
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / editor
+# =========================
+.idea/
+.vscode/
+
+# =========================
+# Python version / local config
+# =========================
+.python-version
+
+# =========================
+# Secrets / local credentials
+# =========================
+.env
+.env.*
+*.pem
+*.key
+*.crt
+
+# =========================
+# Optional: large datasets
+# If your datasets are large or reproducible elsewhere,
+# keep this ignored. Otherwise remove this line.
+# =========================
+# datasets/

@@ -1,0 +1,8 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+large,postgresql_large,flash,5,591.37 (14.64),16.72
+large,postgresql_large,ga,3,709.27 (52.87),77.22
+large,postgresql_large,smac,2,747.88 (77.32),135.29
+large,postgresql_large,hebo,1,1000.93 (106.33),137.35
+large,postgresql_large,bestconfig,6,582.96 (43.34),38.21
+large,postgresql_large,promisetune,4,695.64 (36.83),55.63
+large,postgresql_large,random_search,7,569.98 (28.09),41.43

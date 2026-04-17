@@ -1,0 +1,8 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+medium,mysql_medium,flash,1,0.01 (0.00),0.00
+medium,mysql_medium,ga,1,0.01 (0.00),0.00
+medium,mysql_medium,smac,1,0.01 (0.00),0.00
+medium,mysql_medium,hebo,1,0.01 (0.00),0.00
+medium,mysql_medium,bestconfig,1,0.01 (0.00),0.00
+medium,mysql_medium,promisetune,1,0.01 (0.00),0.00
+medium,mysql_medium,random_search,1,0.01 (0.00),0.00

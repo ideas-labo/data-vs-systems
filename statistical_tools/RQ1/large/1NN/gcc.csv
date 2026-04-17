@@ -1,0 +1,8 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+large,gcc_large,flash,1,67.84 (2.98),1.73
+large,gcc_large,ga,2,67.94 (1.58),1.75
+large,gcc_large,smac,3,68.47 (1.56),0.98
+large,gcc_large,hebo,3,68.44 (1.64),1.69
+large,gcc_large,bestconfig,2,68.26 (1.07),1.68
+large,gcc_large,promisetune,3,70.35 (1.93),3.56
+large,gcc_large,random_search,2,68.06 (1.63),2.89

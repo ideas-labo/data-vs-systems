@@ -1,0 +1,8 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+medium,tomcat_medium,flash,4,2690.57 (6.75),6.76
+medium,tomcat_medium,ga,2,2705.25 (12.35),10.23
+medium,tomcat_medium,smac,2,2705.85 (10.06),7.18
+medium,tomcat_medium,hebo,1,2719.69 (11.43),14.48
+medium,tomcat_medium,bestconfig,3,2693.64 (10.29),17.43
+medium,tomcat_medium,promisetune,5,2660.32 (4.36),6.67
+medium,tomcat_medium,random_search,6,2651.38 (3.31),4.32

@@ -1,0 +1,8 @@
+,1NN,dal_rf,kNN,kNNw,loess,rf,rf_uncertainty,worst
+bestconfig,5,6,5,5,5,4,6,1.0
+flash,3,2,1,3,3,1,1,1.0
+ga,3,1,2,4,1,2,3,1.0
+hebo,5,3,1,1,3,1,2,1.0
+promisetune,2,5,3,2,2,3,5,1.0
+random_search,4,6,4,5,4,5,7,1.0
+smac,1,4,4,4,1,3,4,1.0
