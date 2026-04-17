@@ -20,11 +20,10 @@ from tuner.line_pool import LINEPoolTuner
 
 def run_one_experiment(fallback, run_id, budgets, systems, compared_algorithms):
     """
-    单个 (fallback, run_id) 的完整实验流程：
-    - 遍历 system
-    - 遍历 scale (dataset)
-    - 遍历 algorithm
-    完全复用你原来的逻辑，只是从 main 里抽出来，方便多线程调用。
+    single experiment for one (fallback, run_id):
+    -  system
+    -  scale (dataset)
+    -  algorithm
     """
     start_time = time.time()
     print(f"\n========================Run {run_id + 1} (fallback={fallback}) START==========================")
