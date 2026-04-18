@@ -4,6 +4,21 @@ import numpy as np
 from scipy.stats import spearmanr, kendalltau
 from typing import Tuple, Optional, List
 
+from scipy.stats import pearsonr
+
+def pearson_on_system(gt_r: pd.Series, est_r: pd.Series):
+    """
+    Compute Pearson correlation between two rank vectors for overlapping algorithms.
+    Return (r, n_pairs). If insufficient pairs -> (nan, n)
+    """
+    common_algos = gt_r.dropna().index.intersection(est_r.dropna().index)
+    if len(common_algos) < 2:
+        return float("nan"), int(len(common_algos))
+
+    x = gt_r.loc[common_algos].values
+    y = est_r.loc[common_algos].values
+    r, _ = pearsonr(x, y)
+    return float(r), int(len(common_algos))
 
 def kendall_on_system(gt_r: pd.Series, est_r: pd.Series):
     common = gt_r.dropna().index.intersection(est_r.dropna().index)
@@ -254,7 +269,7 @@ def analyze_scale_consistency(
 
     print(f"\n================ Scale: {scale} ================")
 
-    metrics = ["spearman", "kendall"]
+    metrics = ["spearman", "kendall", "pearson"]
     if ndcg_ks:
         metrics.extend([f"ndcg@{k}" for k in ndcg_ks])
     metrics.append("top1")
@@ -290,6 +305,12 @@ def analyze_scale_consistency(
                     if np.isfinite(tau):
                         values.append(tau)
 
+                elif metric == "pearson":
+                    r, n = pearson_on_system(gt_ranks[sys], est_ranks[sys])
+                    row[sys] = f"{r:.3f}" if np.isfinite(r) else "—"
+                    if np.isfinite(r):
+                        values.append(r)
+
                 elif metric.startswith("ndcg@"):
                     k = int(metric.split("@")[1])
                     ndcg, n = ndcg_on_system(gt_ranks[sys], est_ranks[sys], k=k)
@@ -302,7 +323,7 @@ def analyze_scale_consistency(
                     row[sys] = "✓" if hit else "✗"
                     hits.append(hit)
 
-            if metric in ["spearman", "kendall"] or metric.startswith("ndcg@"):
+            if metric in ["spearman", "kendall", "pearson"] or metric.startswith("ndcg@"):
                 row["mean"] = f"{np.mean(values):.3f}" if values else "—"
             else:
                 row["hit_rate"] = f"{sum(hits)}/{len(hits)}"
@@ -313,7 +334,7 @@ def analyze_scale_consistency(
 
 
 def pretty_print(rows, systems, metric):
-    if metric in ["spearman", "kendall"] or metric.startswith("ndcg@"):
+    if metric in ["spearman", "kendall", "pearson"] or metric.startswith("ndcg@"):
         cols = ["estimation"] + systems + ["mean"]
     else:
         cols = ["estimation"] + systems + ["hit_rate"]
