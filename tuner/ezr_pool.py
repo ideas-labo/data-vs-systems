@@ -2,21 +2,24 @@ import time
 import math
 import random
 import numpy as np
+from collections import Counter
 
 
 class EZRPoolTuner:
     """
-    Core logic:
-    - Warm-start with a small number of randomly evaluated configs from config_space.
-    - Maintain two groups: Best and Rest.
-    - Use a mixed-type Naive Bayes style likelihood:
-        * numeric features -> Gaussian likelihood
-        * categorical features -> frequency with smoothing
-    - Use EZR's acquisition function:
-        * xploit
-        * xplore
-        * adapt (default)
-    - Sequentially select one config from the remaining pool, evaluate it, and update Best/Rest.
+    Faithful pool-based reproduction of the original EZR active learner.
+
+    Main ideas reproduced from source:
+    1. Initialize an unlabeled queue x by shuffling the full pool once.
+    2. Warm-start by popping Any items from x and evaluating them.
+    3. Split labeled data into best/rest.
+    4. Repeatedly choose one new config from x using:
+         - nearer() if acq == "near"
+         - likelier() otherwise
+    5. After each new evaluation:
+         - add it to done
+         - temporarily add it to best
+         - prune best back to sqrt(|done|), moving weakest to rest
     """
 
     def __init__(self, config_manager, run, budget, logger=None, fallback=None):
@@ -26,23 +29,27 @@ class EZRPoolTuner:
         self.fallback = fallback
         self.alive = budget
 
-        # EZR-style parameters (close to source defaults)
-        self.start = 4
-        self.stop = budget
-        self.guess = 0.5       # cut = round(n ** guess)
-        self.few = 50          # candidate window size control
-        self.acq = "adapt"     # xploit | xplore | adapt
-        self.k = 1             # low frequency Bayes hack
-        self.m = 2             # low frequency Bayes hack
+        # Source-style defaults
+        self.start = 4              # Any
+        self.stop = budget          # Budget
+        self.few = 128              # Few
+        self.acq = "adapt"           # near | xploit | xplor | bore | adapt
+        self.m = 1                  # Bayes low frequency param
+        self.p = 2                  # distance coefficient
         self.eps = 1e-32
 
         self.evaluated_configs = {}   # config tuple -> perf
         self.all_results = []
 
-        # explicit dynamic groups
-        self.done = []   # list of (cfg, perf)
-        self.best = []   # list of (cfg, perf)
-        self.rest = []   # list of (cfg, perf)
+        # faithful dynamic structures
+        self.todo_queue = []          # corresponds to x.rows
+        self.done = []                # corresponds to xy.rows, list of (cfg, perf)
+        self.best = []                # list of (cfg, perf)
+        self.rest = []                # list of (cfg, perf)
+
+    # ============================================================
+    # Main
+    # ============================================================
 
     def tuning(self):
         start_time = time.time()
@@ -53,17 +60,23 @@ class EZRPoolTuner:
             self._finalize(start_time)
             return None
 
-        # shuffle pool once, similar to EZR's initial shuffle(data.rows)
-        random.shuffle(pool_configs)
+        # x = shuffle(rows[:])
+        self.todo_queue = pool_configs[:]
+        random.shuffle(self.todo_queue)
 
-        # Step 1: warm start
-        init_size = min(self.start, len(pool_configs), self.alive)
+        # --------------------------------------------------------
+        # Step 1: warm start by popping from x
+        # source:
+        # for _ in range(the.Any): add(xy, label(sub(x, x.rows.pop())))
+        # --------------------------------------------------------
+        init_size = min(self.start, len(self.todo_queue), self.alive)
         if init_size <= 0:
             print("[INFO] No budget for initialization, stopping.")
             self._finalize(start_time)
             return None
 
-        init_configs = pool_configs[:init_size]
+        init_configs = [self.todo_queue.pop() for _ in range(init_size)]
+
         evaluated_init, self.alive = self.config_manager.evaluate(
             init_configs, self.fallback, self.alive
         )
@@ -78,49 +91,46 @@ class EZRPoolTuner:
             self.all_results.append((cfg, perf))
             self.done.append((cfg, perf))
 
-        # initialize best/rest from initial done
-        self._rebuild_best_rest_from_done()
+        # --------------------------------------------------------
+        # Step 2: divide labelled items into best/rest
+        # source:
+        # xy.rows = distysort(xy); n = round(the.Any**.5)
+        # adds(xy.rows[:n], best); adds(xy.rows[n:], rest)
+        # --------------------------------------------------------
+        self.done = self.sort_configs_by_perf(self.done)
+        cut = max(1, round(self.start ** 0.5))
+        self.best = self.done[:cut]
+        self.rest = self.done[cut:]
 
-        if len(self.best) == 0 or len(self.rest) == 0:
-            print("[INFO] Not enough data to form both Best and Rest after initialization.")
+        if len(self.best) == 0:
+            print("[INFO] Empty best set after initialization, stopping.")
             self._finalize(start_time)
             return None
 
-        # Step 2: active learning loop
-        while self.alive > 0 and len(self.done) < self.stop:
+        # --------------------------------------------------------
+        # Step 3: active learning loop
+        # source:
+        # while x.n > 2 and xy.n < the.Budget:
+        # --------------------------------------------------------
+        while self.alive > 0 and len(self.todo_queue) > 2 and len(self.done) < self.stop:
             print(f"[Run {self.run}] | [EZR-Pool] Evaluations left: {self.alive}")
 
-            # remaining pool
-            todo = [cfg for cfg in pool_configs if tuple(cfg) not in self.evaluated_configs]
-            if not todo:
-                print("[INFO] No unevaluated configs left in the pool, stopping early.")
+            # guess = nearer if acq=="near" else likelier
+            if self.acq == "near":
+                chosen_cfg = self.nearer()
+            else:
+                chosen_cfg = self.likelier()
+
+            if chosen_cfg is None:
+                print("[INFO] No candidate returned, stopping.")
                 break
-
-            n = len(self.done)
-
-            # closer to source: only rank a front window todo[:few*2]
-            candidate_front = todo[: min(len(todo), self.few * 2)]
-            if not candidate_front:
-                print("[INFO] No candidates available in the active window, stopping.")
-                break
-
-            scored = []
-            progress = min(1.0, n / max(1, self.stop))
-            for cfg in candidate_front:
-                b_log = self.like(cfg, self.best, nall=n, nh=2)
-                r_log = self.like(cfg, self.rest, nall=n, nh=2)
-                score = self.acquire(progress, b_log, r_log)
-                scored.append((score, cfg))
-
-            scored.sort(key=lambda x: x[0], reverse=True)
-            best_config = scored[0][1]
 
             evaluated_one, self.alive = self.config_manager.evaluate(
-                [best_config], self.fallback, self.alive
+                [chosen_cfg], self.fallback, self.alive
             )
 
             if not evaluated_one:
-                print("[WARN] Evaluation returned empty result. Stopping to avoid infinite loop.")
+                print("[WARN] Evaluation returned empty result. Stopping early.")
                 break
 
             cfg, perf = evaluated_one[0]
@@ -128,21 +138,22 @@ class EZRPoolTuner:
             self.all_results.append((cfg, perf))
             self.done.append((cfg, perf))
 
-            # dynamic maintenance closer to source logic:
-            # 1) add new point into best
+            # source:
+            # add(xy, add(best, sub(x, label(guess(...)))))
+            # i.e., new point is first added to best
             self.best.append((cfg, perf))
 
-            # 2) sort best according to performance under current optimization goal
-            self.best = self.sort_configs_by_perf(self.best)
-
-            # 3) keep only top round(n^guess) in best, move weakest to rest
-            cut = self.compute_cut(len(self.done))
-            while len(self.best) > cut:
-                weakest = self.best.pop(-1)
-                self.rest.append(weakest)
-
-            # 4) optional cleanup to avoid duplication across best/rest
-            self._deduplicate_best_rest()
+            # source:
+            # if best.n > (xy.n**.5):
+            #   best.rows = distysort(xy,best.rows)
+            #   while best.n > (xy.n**.5):
+            #       add(rest, sub(best, best.rows.pop(-1)))
+            threshold = max(1, round(len(self.done) ** 0.5))
+            if len(self.best) > threshold:
+                self.best = self.sort_configs_by_perf(self.best)
+                while len(self.best) > threshold:
+                    weakest = self.best.pop(-1)
+                    self.rest.append(weakest)
 
             try:
                 print(f"[INFO] Evaluated new config: {cfg} -> {perf:.4f}")
@@ -152,162 +163,235 @@ class EZRPoolTuner:
         self._finalize(start_time)
         return None
 
-    # ------------------------------------------------------------------
-    # EZR-style acquisition
-    # ------------------------------------------------------------------
+    # ============================================================
+    # Original EZR acquisition methods
+    # ============================================================
 
-    def acquire(self, p, b_log, r_log):
+    def nearer(self):
         """
-        EZR acquisition from source:
+        Faithful to source:
 
-            b,r = exp(b_log), exp(r_log)
-            q = 0 if xploit else 1 if xplore else 1-p
-            score = (b + r*q) / abs(b*q - r + eps)
+            for _ in range(Few):
+                row = x.rows[i := random.randrange(x.n)]
+                if distx(xy, mids(best), row) < distx(xy, mids(rest), row):
+                    return x.rows.pop(i)
+            return x.rows.pop()
 
-        where p is the progress ratio n / Stop.
+        Notes:
+        - best/rest mids are computed from current groups.
+        - if rest is empty, fallback to random pop.
         """
-        b = math.exp(b_log)
-        r = math.exp(r_log)
+        if len(self.todo_queue) == 0:
+            return None
+
+        if len(self.best) == 0 or len(self.rest) == 0:
+            return self.todo_queue.pop()
+
+        best_mid = self.group_mid(self.best)
+        rest_mid = self.group_mid(self.rest)
+
+        trials = min(self.few, len(self.todo_queue))
+        for _ in range(trials):
+            i = random.randrange(len(self.todo_queue))
+            row = self.todo_queue[i]
+            if self.distx(best_mid, row) < self.distx(rest_mid, row):
+                return self.todo_queue.pop(i)
+
+        return self.todo_queue.pop()
+
+    def likelier(self):
+        """
+        Faithful to source:
+
+            first, *lst = sorted(x.rows[:Few*2], key=_fn, reverse=True)
+            x.rows = lst[:Few] + x.rows[Few*2:] + lst[Few:]
+            return first
+
+        This dynamic queue reordering is the key behavior missing from
+        the previous simplified implementation.
+        """
+        if len(self.todo_queue) == 0:
+            return None
+
+        nall = len(self.best) + len(self.rest)
+        if nall <= 0:
+            return self.todo_queue.pop()
+
+        p = nall / max(1, self.stop)
 
         if self.acq == "xploit":
             q = 0.0
-        elif self.acq == "xplore":
+        elif self.acq == "xplor":
             q = 1.0
-        else:  # adapt
+        else:  # adapt or bore or any other non-near mode
             q = 1.0 - p
 
-        return (b + r * q) / abs(b * q - r + self.eps)
+        window_size = min(len(self.todo_queue), self.few * 2)
+        front = self.todo_queue[:window_size]
 
-    # ------------------------------------------------------------------
-    # EZR-style mixed-type Naive Bayes likelihood
-    # ------------------------------------------------------------------
+        def score_fn(row):
+            b = math.exp(self.likes(self.best, row, nall=nall, nh=2))
+            r = math.exp(self.likes(self.rest, row, nall=nall, nh=2))
 
-    def like(self, cfg, group, nall=100, nh=2):
+            if self.acq == "bore":
+                return b * b / (r + self.eps)
+
+            return (b + r * q) / abs(b * q - r + self.eps)
+
+        ranked = sorted(front, key=score_fn, reverse=True)
+        first = ranked[0]
+        lst = ranked[1:]
+
+        keep_front = lst[:self.few]
+        push_back = lst[self.few:]
+
+        # faithful queue update
+        self.todo_queue = keep_front + self.todo_queue[window_size:] + push_back
+
+        return first
+
+    # ============================================================
+    # Likelihood
+    # ============================================================
+
+    def likes(self, group, row, nall=100, nh=2):
         """
-        Compute log-likelihood of cfg belonging to a group.
-        - categorical: frequency with smoothing
-        - numeric: Gaussian likelihood
+        Faithful to source:
+
+            prior = data.n / (nall + eps)
+            log_prior = log(max(prior, eps))
+            tmp = [like(c, row[c.at]) ...]
+            return log_prior + sum(tmp)
+
+        Here we compute per-dimension summaries directly from group rows.
         """
         if len(group) == 0:
             return math.log(self.eps)
 
-        prior = (len(group) + self.k) / (nall + self.k * nh)
+        prior = len(group) / (nall + self.eps)
+        log_prior = math.log(max(prior, self.eps))
+        log_terms = [log_prior]
 
-        log_terms = [math.log(max(prior, self.eps))]
-
-        num_features = len(cfg)
+        num_features = len(row)
         for i in range(num_features):
-            value = cfg[i]
-            if value == "?":
+            v = row[i]
+            if v == "?":
+                continue
+
+            values = [cfg[i] for cfg, _ in group if cfg[i] != "?"]
+            if len(values) == 0:
                 continue
 
             domain = self.config_manager.value_domains[i]
-            col_values = [gcfg[i] for gcfg, _ in group if gcfg[i] != "?"]
-
-            if len(col_values) == 0:
-                continue
-
-            if self.is_categorical_domain(domain, value):
-                prob = self.sym_likelihood(value, col_values, prior)
+            if self.is_categorical_domain(domain, v):
+                log_terms.append(self.like_sym(v, values, prior))
             else:
-                prob = self.num_likelihood(value, col_values)
-
-            if prob > 0:
-                log_terms.append(math.log(max(prob, self.eps)))
+                log_terms.append(self.like_num(v, values))
 
         return sum(log_terms)
 
-    def sym_likelihood(self, value, values, prior):
-        """
-        Symbolic likelihood:
-            (count(value) + m * prior) / (n + m)
-        """
-        counts = {}
-        for v in values:
-            counts[v] = counts.get(v, 0) + 1
+    def like_sym(self, value, values, prior):
+        counts = Counter(values)
+        tmp = (counts.get(value, 0) + self.m * prior) / (sum(counts.values()) + self.m + self.eps)
+        return math.log(max(tmp, self.eps))
 
-        return (counts.get(value, 0) + self.m * prior) / (len(values) + self.m + self.eps)
-
-    def num_likelihood(self, value, values):
-        """
-        Numeric Gaussian likelihood.
-        """
+    def like_num(self, value, values):
         arr = np.asarray(values, dtype=float)
         mu = float(np.mean(arr))
         sd = float(np.std(arr, ddof=1)) if len(arr) > 1 else 0.0
-        sd = sd + self.eps
 
-        nom = math.exp(-1.0 * ((float(value) - mu) ** 2) / (2 * sd * sd))
-        denom = math.sqrt(2 * math.pi * sd * sd)
-        out = nom / (denom + self.eps)
-        return max(self.eps, min(1.0, out))
+        # faithful to source:
+        # if sd == 0: return 0 if v == mu else 1E-32
+        if sd == 0:
+            return 0.0 if float(value) == mu else math.log(self.eps)
 
-    # ------------------------------------------------------------------
-    # Best / Rest maintenance
-    # ------------------------------------------------------------------
+        var = sd * sd + self.eps
+        log_nom = -1.0 * (float(value) - mu) ** 2 / (2 * var)
+        log_denom = 0.5 * math.log(2 * math.pi * var)
+        return log_nom - log_denom
 
-    def _rebuild_best_rest_from_done(self):
+    # ============================================================
+    # Distance utilities (for acq="near")
+    # ============================================================
+
+    def group_mid(self, group):
         """
-        Build best/rest from all currently evaluated data.
-        This is used at initialization.
+        Mid per dimension:
+        - categorical -> mode
+        - numeric -> mean
         """
-        ordered = self.sort_configs_by_perf(self.done)
-        cut = self.compute_cut(len(ordered))
-        self.best = ordered[:cut]
-        self.rest = ordered[cut:]
+        if len(group) == 0:
+            return None
 
-    def _deduplicate_best_rest(self):
-        """
-        Ensure no config appears in both best and rest.
-        Prefer keeping it in best.
-        """
-        best_keys = {tuple(cfg) for cfg, _ in self.best}
-        new_rest = []
-        seen = set()
+        mids = []
+        num_features = len(group[0][0])
 
-        for cfg, perf in self.rest:
-            key = tuple(cfg)
-            if key in best_keys:
+        for i in range(num_features):
+            values = [cfg[i] for cfg, _ in group if cfg[i] != "?"]
+            if len(values) == 0:
+                mids.append("?")
                 continue
-            if key in seen:
-                continue
-            seen.add(key)
-            new_rest.append((cfg, perf))
 
-        self.rest = new_rest
+            domain = self.config_manager.value_domains[i]
+            if self.is_categorical_domain(domain, values[0]):
+                mids.append(Counter(values).most_common(1)[0][0])
+            else:
+                mids.append(float(np.mean(np.asarray(values, dtype=float))))
 
-        # also deduplicate best itself, keep first occurrence
-        new_best = []
-        seen = set()
-        for cfg, perf in self.best:
-            key = tuple(cfg)
-            if key in seen:
-                continue
-            seen.add(key)
-            new_best.append((cfg, perf))
-        self.best = new_best
+        return mids
 
-    def compute_cut(self, n):
-        cut = int(round(n ** self.guess))
-        cut = max(1, min(cut, n - 1)) if n >= 2 else 1
-        return cut
+    def distx(self, row1, row2):
+        """
+        Mixed-type Minkowski distance, close in spirit to source distx().
+        """
+        ds = []
+        for i, (a, b) in enumerate(zip(row1, row2)):
+            domain = self.config_manager.value_domains[i]
+            ds.append(self.aha(domain, a, b) ** self.p)
+
+        return (sum(ds) / max(1, len(ds))) ** (1.0 / self.p)
+
+    def aha(self, domain, a, b):
+        """
+        Source-inspired Aha distance:
+        - both missing -> 1
+        - symbolic -> 0/1
+        - numeric -> normalized absolute difference
+        """
+        if a == "?" and b == "?":
+            return 1.0
+
+        if self.is_categorical_domain(domain, a) or self.is_categorical_domain(domain, b):
+            return 0.0 if a == b else 1.0
+
+        numeric_domain = [float(x) for x in domain if x != "?"]
+        lo = min(numeric_domain)
+        hi = max(numeric_domain)
+
+        a = self.norm(a, lo, hi)
+        b = self.norm(b, lo, hi)
+
+        if a == "?":
+            a = 0.0 if b > 0.5 else 1.0
+        if b == "?":
+            b = 0.0 if a > 0.5 else 1.0
+
+        return abs(a - b)
+
+    def norm(self, v, lo, hi):
+        if v == "?":
+            return "?"
+        return (float(v) - lo) / (hi - lo + self.eps)
+
+    # ============================================================
+    # Sorting / pool utilities
+    # ============================================================
 
     def sort_configs_by_perf(self, cfg_perf_list):
-        """
-        Sort configs from best to worst according to optimization goal.
-        """
         reverse = self.config_manager.optimization_goal == "maximum"
         return sorted(cfg_perf_list, key=lambda x: x[1], reverse=reverse)
 
-    # ------------------------------------------------------------------
-    # Pool / feature utilities
-    # ------------------------------------------------------------------
-
     def get_pool_configs(self):
-        """
-        Get all configurations from config_manager.config_space.
-        Convert each config to a Python list.
-        """
         pool = self.config_manager.config_space
 
         if isinstance(pool, np.ndarray):
@@ -324,21 +408,16 @@ class EZRPoolTuner:
         return processed_pool
 
     def is_categorical_domain(self, domain, value):
-        """
-        Decide whether a feature should be treated as categorical.
-        """
         if isinstance(value, str):
             return True
-
         for d in domain:
             if isinstance(d, str):
                 return True
-
         return False
 
-    # ------------------------------------------------------------------
+    # ============================================================
     # Finalization
-    # ------------------------------------------------------------------
+    # ============================================================
 
     def _finalize(self, start_time):
         if self.logger is not None:
