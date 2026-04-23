@@ -32,7 +32,7 @@ class ConfigManager:
         self.config_dim = None
         self.config_space = []
         self.value_domains = []
-        self.init_config_space()
+        # self.init_config_space()
 
         self.data_df = None
         self.worst_perf = None
@@ -64,22 +64,36 @@ class ConfigManager:
         self.dal_scaler_maxX = None  # optional scaling like DaL
         self.dal_scaler_maxY = None
 
+    # def init_config_space(self):
+    #     system_path = os.path.join("datasets", self.system)
+    #     csv_files = [f for f in os.listdir(system_path) if f.endswith(".csv")]
+    #
+    #     if not csv_files:
+    #         raise FileNotFoundError(f"[ConfigManager] No workload CSV found in {system_path}")
+    #
+    #     sample_df = pd.read_csv(os.path.join(system_path, csv_files[0]))
+    #     config_df = sample_df.iloc[:, :-1]
+    #     self.config_dim = config_df.shape[1]
+    #
+    #     self.config_space = config_df.drop_duplicates().values.tolist()
+    #
+    #     self.value_domains = []
+    #     for col in config_df.columns:
+    #         unique_vals = config_df[col].unique().tolist()
+    #         self.value_domains.append(unique_vals)
+
+
     def init_config_space(self):
-        system_path = os.path.join("datasets", self.system)
-        csv_files = [f for f in os.listdir(system_path) if f.endswith(".csv")]
+        if self.data_df is None:
+            raise RuntimeError("[ConfigManager] data_df is None. Call set_system_scale() first.")
 
-        if not csv_files:
-            raise FileNotFoundError(f"[ConfigManager] No workload CSV found in {system_path}")
-
-        sample_df = pd.read_csv(os.path.join(system_path, csv_files[0]))
-        config_df = sample_df.iloc[:, :-1]
+        config_df = self.data_df.iloc[:, :-1].copy()
         self.config_dim = config_df.shape[1]
-
         self.config_space = config_df.drop_duplicates().values.tolist()
 
         self.value_domains = []
         for col in config_df.columns:
-            unique_vals = config_df[col].unique().tolist()
+            unique_vals = config_df[col].drop_duplicates().tolist()
             self.value_domains.append(unique_vals)
 
     def set_system_scale(self, scales):
@@ -89,6 +103,8 @@ class ConfigManager:
             raise FileNotFoundError(f"[ConfigManager] Scale CSV not found: {path}")
 
         self.data_df = pd.read_csv(path)
+        self.init_config_space()
+
         self.precompute_worst_perf()
         self.config_perf_dict = {
             tuple(row[:-1]): row[-1]
