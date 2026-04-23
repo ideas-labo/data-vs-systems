@@ -14,8 +14,8 @@ import pandas as pd
 # 1. User configuration
 # ============================================================
 
-SYSTEM = "postgresql"
-SYSTEM_SCALE = "postgresql_large"
+SYSTEM = "mysql"
+SYSTEM_SCALE = "mysql_large"
 
 FALLBACKS = [
     "1NN",
@@ -29,13 +29,13 @@ FALLBACKS = [
 ]
 
 ALGORITHMS = [
-    "smac",
-    # "bestconfig",
+    # "smac",
+    "bestconfig",
     # "flash",
     # "ga",
-    # "hebo",
+    "hebo",
     "promisetune",
-    # "random_search",
+    "random_search",
 ]
 
 RUN_IDS = list(range(10))

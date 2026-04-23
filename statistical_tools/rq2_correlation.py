@@ -1,10 +1,9 @@
 import os
 import pandas as pd
 import numpy as np
-from scipy.stats import spearmanr, kendalltau
+from scipy.stats import spearmanr, kendalltau, pearsonr
 from typing import Tuple, Optional, List
 
-from scipy.stats import pearsonr
 
 def pearson_on_system(gt_r: pd.Series, est_r: pd.Series):
     """
@@ -355,6 +354,8 @@ def pretty_print(rows, systems, metric):
         print(" | ".join(str(r.get(c, "")).ljust(widths[c]) for c in cols))
 
 
+
+
 def main():
     rq1_root = "RQ1"
     scales = ["large", "medium", "small"]
@@ -379,3 +380,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
