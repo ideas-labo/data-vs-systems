@@ -1,0 +1,5 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+medium,x265_medium,ezr_pool,2,22.72 (3.93),3.54
+medium,x265_medium,flash_pool,1,18.67 (0.46),0.00
+medium,x265_medium,line_pool,2,22.67 (2.23),3.31
+medium,x265_medium,random_search_pool,3,23.40 (2.47),3.63

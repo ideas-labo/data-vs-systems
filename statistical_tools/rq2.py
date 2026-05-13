@@ -5,7 +5,34 @@ import pandas as pd
 import numpy as np
 from scipy.stats import spearmanr, kendalltau, pearsonr
 
+ALGO_NAME_MAP = {
+    "promise": "promisetune",
+    "promisetune": "promisetune",
+    "promiseTune": "promisetune",
+    "PromiseTune": "promisetune",
 
+    "rs": "random_search",
+    "random_search": "random_search",
+    "randomsearch": "random_search",
+    "RandomSearch": "random_search",
+
+    "flash": "flash",
+    "ga": "ga",
+    "smac": "smac",
+    "hebo": "hebo",
+    "bestconfig": "bestconfig",
+}
+def normalize_algorithm_name(name: str) -> str:
+    """
+    Normalize algorithm names across ground-truth and fallback results.
+    """
+    if pd.isna(name):
+        return name
+
+    raw = str(name).strip()
+    key = raw.replace("-", "_").replace(" ", "_")
+
+    return ALGO_NAME_MAP.get(raw, ALGO_NAME_MAP.get(key, key.lower()))
 # ============================================================
 # Basic correlation helpers
 # ============================================================
@@ -48,10 +75,27 @@ def spearman_on_system(gt_r: pd.Series, est_r: pd.Series) -> Tuple[float, int]:
 # ============================================================
 
 def read_wide_rank_table(csv_path: str) -> pd.DataFrame:
+    """
+    Read wide table like:
+      columns = MultiIndex (system, metric) where metric in {'r','mean',...}
+      index   = Algorithm
+
+    Also normalize algorithm names so that:
+      promise -> promisetune
+      rs      -> random_search
+    """
     if not os.path.exists(csv_path):
         raise FileNotFoundError(csv_path)
+
     df = pd.read_csv(csv_path, header=[0, 1], index_col=0)
-    df.index = df.index.astype(str).str.strip()
+
+    # normalize algorithm names
+    df.index = df.index.astype(str).map(normalize_algorithm_name)
+
+    # if duplicated names appear after normalization, keep the first valid row
+    if df.index.duplicated().any():
+        df = df.groupby(level=0).first()
+
     return df
 
 

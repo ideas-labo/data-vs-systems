@@ -424,9 +424,9 @@ class ConfigManager:
             beta = np.linalg.solve(XtX, Xw.T @ yw)
             yhat = float(x0 @ beta)
 
-            print("y range:", y.min(), y.max(), "yhat:", yhat)
-            print("X shape:", X.shape, "cond:", np.linalg.cond(XtX))
-            print("beta norm:", np.linalg.norm(beta))
+            # print("y range:", y.min(), y.max(), "yhat:", yhat)
+            # print("X shape:", X.shape, "cond:", np.linalg.cond(XtX))
+            # print("beta norm:", np.linalg.norm(beta))
 
         except np.linalg.LinAlgError:
             # fallback to kNN mean if regression fails (e.g. singular matrix)

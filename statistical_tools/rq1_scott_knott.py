@@ -277,11 +277,11 @@ def collect_by_scale_group(
 def main():
 
     systems = ['mysql', 'postgresql', 'httpd', 'tomcat', 'gcc', 'clang', 'x264', 'x265']
-    # compared_algorithms = ['flash', 'ga', 'smac', 'hebo', 'bestconfig', 'promisetune', 'random_search']
-    compared_algorithms = ['ezr_pool', 'flash_pool', 'line_pool', 'random_search_pool']
+    compared_algorithms = ['flash', 'ga', 'smac', 'hebo', 'bestconfig', 'promisetune', 'random_search']
+    # compared_algorithms = ['ezr_pool', 'flash_pool', 'line_pool', 'random_search_pool']
     runs = 10
-    estimations = ['1NN', 'kNN', 'kNNw', 'loess', 'rf', 'rf_uncertainty', 'dal_rf']
-    estimations = ['pool']
+    estimations = ['worst', '1NN', 'kNN', 'kNNw', 'loess', 'rf', 'rf_uncertainty', 'dal_rf']
+    # estimations = ['pool']
 
     for estimation in estimations:
         print(f"\n===== Estimation Method: {estimation} =====")

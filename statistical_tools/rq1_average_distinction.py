@@ -143,20 +143,20 @@ def collect_strategy_tables(root_dir: Path) -> Dict[str, pd.DataFrame]:
             print(f"[Error] Failed to load {csv_path}: {e}")
 
     # Then check if there are extra strategy folders not listed in STRATEGY_ORDER
-    extra_dirs = [
-        child for child in root_dir.iterdir()
-        if child.is_dir() and child.name not in STRATEGY_ORDER
-    ]
-    for child in sorted(extra_dirs, key=lambda x: x.name.lower()):
-        csv_path = child / "scott_knott.csv"
-        if not csv_path.exists():
-            continue
-        try:
-            df = load_scott_knott_ranks(csv_path)
-            strategy_tables[child.name] = df
-            print(f"[OK] Loaded extra strategy {csv_path}")
-        except Exception as e:
-            print(f"[Error] Failed to load extra strategy {csv_path}: {e}")
+    # extra_dirs = [
+    #     child for child in root_dir.iterdir()
+    #     if child.is_dir() and child.name not in STRATEGY_ORDER
+    # ]
+    # for child in sorted(extra_dirs, key=lambda x: x.name.lower()):
+    #     csv_path = child / "scott_knott.csv"
+    #     if not csv_path.exists():
+    #         continue
+    #     try:
+    #         df = load_scott_knott_ranks(csv_path)
+    #         strategy_tables[child.name] = df
+    #         print(f"[OK] Loaded extra strategy {csv_path}")
+    #     except Exception as e:
+    #         print(f"[Error] Failed to load extra strategy {csv_path}: {e}")
 
     if not strategy_tables:
         raise RuntimeError(f"No valid strategy folders found under: {root_dir}")
@@ -456,7 +456,7 @@ def save_average_rank_tex(
     algorithm_order: list[str] | None = None,
     strategy_order: list[str] | None = None,
     best_color: str = "blue!15",
-    second_color: str = "red!15",
+    second_color: str = "teal!15",
     highlight_best: bool = True,
     highlight_second: bool = True,
     bold_best: bool = False,

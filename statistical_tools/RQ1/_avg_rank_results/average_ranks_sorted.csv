@@ -1,8 +1,8 @@
-1NN_algorithm,1NN_avg_rank,kNN_algorithm,kNN_avg_rank,kNNw_algorithm,kNNw_avg_rank,loess_algorithm,loess_avg_rank,rf_algorithm,rf_avg_rank,dal_rf_algorithm,dal_rf_avg_rank,rf_uncertainty_algorithm,rf_uncertainty_avg_rank,worst_algorithm,worst_avg_rank
-flash,1.62,hebo,1.12,hebo,1.38,smac,1.50,hebo,1.62,hebo,2.00,hebo,1.38,ga,1.12
-ga,2.88,smac,2.12,ga,2.25,hebo,2.00,smac,2.12,smac,2.50,flash,2.25,hebo,1.12
-bestconfig,2.88,ga,2.25,smac,2.50,ga,2.62,promisetune,2.12,promisetune,2.50,smac,2.50,smac,1.25
-random_search,3.00,flash,2.88,flash,3.00,promisetune,2.75,flash,2.38,flash,2.75,promisetune,2.50,random_search,1.25
-promisetune,3.12,bestconfig,4.00,promisetune,4.25,flash,3.38,ga,3.12,ga,4.00,ga,2.75,flash,1.50
-smac,3.50,promisetune,4.50,bestconfig,4.38,random_search,4.62,random_search,4.25,random_search,5.25,random_search,4.62,bestconfig,1.75
-hebo,3.88,random_search,5.38,random_search,5.50,bestconfig,4.88,bestconfig,5.12,bestconfig,5.75,bestconfig,4.75,promisetune,1.75
+1NN_algorithm,1NN_avg_rank,kNN_algorithm,kNN_avg_rank,kNNw_algorithm,kNNw_avg_rank,loess_algorithm,loess_avg_rank,rf_algorithm,rf_avg_rank,dal_rf_algorithm,dal_rf_avg_rank,rf_uncertainty_algorithm,rf_uncertainty_avg_rank
+flash,1.12,hebo,1.25,hebo,1.50,smac,1.88,hebo,1.88,hebo,2.00,hebo,1.75
+ga,2.00,ga,2.00,ga,2.25,hebo,2.25,promisetune,2.25,promisetune,2.25,promisetune,2.50
+promisetune,2.62,promisetune,2.62,smac,2.25,ga,2.62,smac,2.50,flash,2.75,flash,2.62
+smac,2.75,smac,2.88,promisetune,2.75,promisetune,2.75,flash,2.88,smac,3.00,smac,2.75
+bestconfig,3.38,flash,3.62,flash,3.62,flash,3.75,ga,3.88,ga,4.12,ga,3.38
+random_search,3.50,bestconfig,4.50,random_search,4.25,random_search,4.62,random_search,5.00,random_search,5.00,random_search,5.12
+hebo,3.75,random_search,5.12,bestconfig,4.62,bestconfig,5.00,bestconfig,5.62,bestconfig,5.75,bestconfig,5.25

@@ -1,0 +1,4 @@
+system,dataset,scale,file,performance_column,count,mean,std,min,q1,median,q3,max
+gcc,gcc_large,large,/Users/oliver/DataEval/datasets/gcc/gcc_large.csv,run_time,20000,0.08943485833560001,0.007665756762582698,0.06154418,0.084325314,0.089426517,0.094637156,0.127899647
+gcc,gcc_medium,medium,/Users/oliver/DataEval/datasets/gcc/gcc_medium.csv,run_time,10000,0.08941608357509999,0.0076757807748790785,0.063032866,0.08433341975,0.089407921,0.09465611,0.11623621
+gcc,gcc_small,small,/Users/oliver/DataEval/datasets/gcc/gcc_small.csv,run_time,5000,0.08937985997020001,0.00767811682945404,0.06303215,0.08430224675,0.089370847,0.09460330025,0.116072655

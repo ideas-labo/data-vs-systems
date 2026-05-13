@@ -3,6 +3,87 @@ import pandas as pd
 import numpy as np
 from scipy.stats import spearmanr, kendalltau, pearsonr
 from typing import Tuple, Optional, List
+import re
+
+ALGO_NAME_MAP = {
+    "promise": "promisetune",
+    "promisetune": "promisetune",
+    "promiseTune": "promisetune",
+    "PromiseTune": "promisetune",
+
+    "rs": "random_search",
+    "random_search": "random_search",
+    "randomsearch": "random_search",
+    "RandomSearch": "random_search",
+
+    "flash": "flash",
+    "ga": "ga",
+    "smac": "smac",
+    "hebo": "hebo",
+    "bestconfig": "bestconfig",
+}
+
+def normalize_algorithm_name(name: str) -> str:
+    """
+    Normalize algorithm names across ground-truth and fallback results.
+    """
+    if pd.isna(name):
+        return name
+
+    raw = str(name).strip()
+    key = raw.replace("-", "_").replace(" ", "_")
+
+    return ALGO_NAME_MAP.get(raw, ALGO_NAME_MAP.get(key, key.lower()))
+
+
+def extract_mean_series(df_wide: pd.DataFrame, system: str) -> pd.Series:
+    """
+    Return mean performance series for one system:
+      index = Algorithm
+      values = mean performance only
+
+    Expected cell format:
+      275.29 (2.29)
+      67.28 (2.40)
+    """
+    col = (system, 'mean')
+    if col not in df_wide.columns:
+        return pd.Series(dtype=float)
+
+    s = df_wide[col].copy()
+    s = s.apply(lambda v: np.nan if (pd.isna(v) or str(v).strip() == "") else str(v).strip())
+
+    def parse_mean(v):
+        if pd.isna(v):
+            return np.nan
+
+        text = str(v).strip()
+
+        # remove possible wrappers, e.g., [275.29 (2.29)]
+        text = text.strip("[]")
+
+        # extract the first numeric value before std
+        match = re.search(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?", text)
+        if match is None:
+            return np.nan
+
+        return float(match.group(0))
+
+    s = s.apply(parse_mean)
+    s.name = system
+    return s
+
+MAXIMIZE_SYSTEMS = {"mysql", "postgresql", "httpd", "tomcat"}
+
+def mean_to_score(mean_s: pd.Series, system: str) -> pd.Series:
+    """
+    Convert raw mean performance into a unified score:
+    larger score = better performance.
+    """
+    if system in MAXIMIZE_SYSTEMS:
+        return mean_s
+    else:
+        return -mean_s
 
 
 def pearson_on_system(gt_r: pd.Series, est_r: pd.Series):
@@ -63,11 +144,23 @@ def read_wide_rank_table(csv_path: str) -> pd.DataFrame:
     Read wide table like:
       columns = MultiIndex (system, metric) where metric in {'r','mean',...}
       index   = Algorithm
+
+    Also normalize algorithm names so that:
+      promise -> promisetune
+      rs      -> random_search
     """
     if not os.path.exists(csv_path):
         raise FileNotFoundError(csv_path)
+
     df = pd.read_csv(csv_path, header=[0, 1], index_col=0)
-    df.index = df.index.astype(str).str.strip()
+
+    # normalize algorithm names
+    df.index = df.index.astype(str).map(normalize_algorithm_name)
+
+    # if duplicated names appear after normalization, keep the first valid row
+    if df.index.duplicated().any():
+        df = df.groupby(level=0).first()
+
     return df
 
 
@@ -265,13 +358,16 @@ def analyze_scale_consistency(
 ):
     gt_df = read_wide_rank_table(gt_path)
     gt_ranks = {s: extract_rank_series(gt_df, s) for s in systems}
+    gt_means = {s: extract_mean_series(gt_df, s) for s in systems}
 
     print(f"\n================ Scale: {scale} ================")
 
-    metrics = ["spearman", "kendall", "pearson"]
-    if ndcg_ks:
-        metrics.extend([f"ndcg@{k}" for k in ndcg_ks])
-    metrics.append("top1")
+    # metrics = ["spearman_sk", "kendall", "pearson", "spearman_mean"]
+    # if ndcg_ks:
+    #     metrics.extend([f"ndcg@{k}" for k in ndcg_ks])
+    # metrics.append("top1")
+
+    metrics = ["spearman_sk"]
 
     for metric in metrics:
         print(f"\n---- {metric.upper()} ----")
@@ -285,6 +381,7 @@ def analyze_scale_consistency(
 
             est_df = read_wide_rank_table(est_path)
             est_ranks = {s: extract_rank_series(est_df, s) for s in systems}
+            est_means = {s: extract_mean_series(est_df, s) for s in systems}
 
             values = []
             hits = []
@@ -292,8 +389,17 @@ def analyze_scale_consistency(
             row = {"estimation": est}
 
             for sys in systems:
-                if metric == "spearman":
+                if metric == "spearman_sk":
                     rho, n = spearman_on_system(gt_ranks[sys], est_ranks[sys])
+                    row[sys] = f"{rho:.3f}" if np.isfinite(rho) else "—"
+                    if np.isfinite(rho):
+                        values.append(rho)
+
+
+                elif metric == "spearman_mean":
+                    gt_score = mean_to_score(gt_means[sys], sys)
+                    est_score = mean_to_score(est_means[sys], sys)
+                    rho, n = spearman_on_system(gt_score, est_score)
                     row[sys] = f"{rho:.3f}" if np.isfinite(rho) else "—"
                     if np.isfinite(rho):
                         values.append(rho)
@@ -322,7 +428,7 @@ def analyze_scale_consistency(
                     row[sys] = "✓" if hit else "✗"
                     hits.append(hit)
 
-            if metric in ["spearman", "kendall", "pearson"] or metric.startswith("ndcg@"):
+            if metric in ["spearman_sk", "kendall", "pearson", "spearman_mean"] or metric.startswith("ndcg@"):
                 row["mean"] = f"{np.mean(values):.3f}" if values else "—"
             else:
                 row["hit_rate"] = f"{sum(hits)}/{len(hits)}"
@@ -333,7 +439,7 @@ def analyze_scale_consistency(
 
 
 def pretty_print(rows, systems, metric):
-    if metric in ["spearman", "kendall", "pearson"] or metric.startswith("ndcg@"):
+    if metric in ["spearman_sk", "kendall", "pearson", "spearman_mean"] or metric.startswith("ndcg@"):
         cols = ["estimation"] + systems + ["mean"]
     else:
         cols = ["estimation"] + systems + ["hit_rate"]
@@ -360,7 +466,9 @@ def main():
     rq1_root = "RQ1"
     scales = ["large", "medium", "small"]
     estimations = ['worst', '1NN', 'kNN', 'kNNw', 'loess', 'rf', 'rf_uncertainty', 'dal_rf']
-    systems = ['mysql', 'postgresql', 'httpd', 'tomcat', 'gcc', 'clang', 'x264', 'x265']
+    # estimations = ['rf_uncertainty']
+    # systems = ['mysql', 'postgresql', 'httpd', 'tomcat', 'gcc', 'clang', 'x264', 'x265']
+    systems = ['mysql', 'postgresql', 'httpd', 'tomcat', 'x264', 'x265']
 
     gt_path = os.path.join("ground_truth.csv")
 

@@ -1,0 +1,4 @@
+system,dataset,scale,file,performance_column,count,mean,std,min,q1,median,q3,max
+tomcat,tomcat_large,large,/Users/oliver/DataEval/datasets/tomcat/tomcat_large.csv,RPS,19352,2625.8172757337743,112.97468983558443,971.01,2593.74,2632.395,2673.6825,4988.28
+tomcat,tomcat_medium,medium,/Users/oliver/DataEval/datasets/tomcat/tomcat_medium.csv,RPS,9686,2625.244717117489,112.55957946500479,1002.58,2593.245,2632.15,2673.815,3299.48
+tomcat,tomcat_small,small,/Users/oliver/DataEval/datasets/tomcat/tomcat_small.csv,RPS,4829,2624.935628494513,115.98480023828766,971.01,2593.03,2631.66,2674.08,3707.2

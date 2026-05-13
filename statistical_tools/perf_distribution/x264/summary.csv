@@ -1,0 +1,4 @@
+system,dataset,scale,file,performance_column,count,mean,std,min,q1,median,q3,max
+x264,x264_large,large,/Users/oliver/DataEval/datasets/x264/x264_large.csv,run_time,20000,38.168116,37.21271383399152,8.69,14.97,22.76,47.16,333.37
+x264,x264_medium,medium,/Users/oliver/DataEval/datasets/x264/x264_medium.csv,run_time,10000,38.291887,37.34745216918058,8.69,15.0,22.77,47.35,333.37
+x264,x264_small,small,/Users/oliver/DataEval/datasets/x264/x264_small.csv,run_time,5000,37.708648,36.01081957706734,8.7,15.0775,22.994999999999997,47.03,312.37

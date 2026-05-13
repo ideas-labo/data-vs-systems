@@ -11,11 +11,12 @@ from tuner.promiseTune import PromiseTuner
 from tuner.hebo import HEBOTuner
 from tuner.bestconfig import BestConfigTuner
 from tuner.random_search import RandomSearchTuner
-from tuner.bounceTuner import BounceTuner
 from tuner.flash_pool import FLASHPoolTuner
 from tuner.random_search_pool import RandomSearchPoolTuner
 from tuner.ezr_pool import EZRPoolTuner
 from tuner.line_pool import LINEPoolTuner
+from tuner.ezr import EZRTuner
+from tuner.line import LINETuner
 
 
 def run_one_experiment(fallback, run_id, budgets, systems, compared_algorithms):
@@ -67,8 +68,6 @@ def run_one_experiment(fallback, run_id, budgets, systems, compared_algorithms):
                     tuner = BestConfigTuner(config_manager, run_id, budget, logger, fallback)
                 elif algo_name == 'random_search':
                     tuner = RandomSearchTuner(config_manager, run_id, budget, logger, fallback)
-                elif algo_name == 'bounce':
-                    tuner = BounceTuner(config_manager, run_id, budget, logger, fallback)
                 elif algo_name == 'flash_pool':
                     tuner = FLASHPoolTuner(config_manager, run_id, budget, logger, fallback)
                 elif algo_name == 'random_search_pool':
@@ -77,6 +76,10 @@ def run_one_experiment(fallback, run_id, budgets, systems, compared_algorithms):
                     tuner = EZRPoolTuner(config_manager, run_id, budget, logger, fallback)
                 elif algo_name == 'line_pool':
                     tuner = LINEPoolTuner(config_manager, run_id, budget, logger, fallback)
+                elif algo_name == 'ezr':
+                    tuner = EZRTuner(config_manager, run_id, budget, logger, fallback)
+                elif algo_name == 'line':
+                    tuner = LINETuner(config_manager, run_id, budget, logger, fallback)
                 else:
                     raise ValueError(f"Unknown algorithm: {algo_name}")
 
@@ -91,14 +94,12 @@ def main():
     budgets = {'mysql': 350, 'postgresql': 350, 'httpd': 250, 'tomcat': 250, 'gcc': 350, 'clang': 350, 'x264': 200, 'x265':200}
     runs = 10
     systems = ['mysql', 'postgresql', 'httpd', 'tomcat', 'gcc', 'clang', 'x264', 'x265']
-    compared_algorithms = ['flash', 'ga', 'smac', 'hebo', 'bestconfig','promisetune', 'random_search']
-    # compared_algorithms = ['flash_pool', 'random_search_pool', 'ezr_pool', 'line_pool']
-
-    
+    compared_algorithms = ['flash', 'ga', 'smac', 'hebo', 'bestconfig', 'promisetune', 'random_search', 'ezr', 'line']
+    compared_algorithms = ['flash_pool', 'random_search_pool', 'ezr_pool', 'line_pool']
 
     # fall back strategies
-    fallbacks = ['worst', '1NN', 'kNN', 'kNNw', 'loess', 'rf', 'dal_rf', 'rf_uncertainty']
-
+    # fallbacks = ['worst', '1NN', 'kNN', 'kNNw', 'loess', 'rf', 'dal_rf', 'rf_uncertainty']
+    fallbacks = ['pool']
 
     global_start = time.time()
 

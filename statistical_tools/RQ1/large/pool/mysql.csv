@@ -1,0 +1,5 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+large,mysql_large,ezr_pool,2,276.46 (2.88),0.00
+large,mysql_large,flash_pool,1,281.15 (0.00),0.00
+large,mysql_large,line_pool,3,273.76 (3.84),3.43
+large,mysql_large,random_search_pool,4,271.06 (3.99),6.80

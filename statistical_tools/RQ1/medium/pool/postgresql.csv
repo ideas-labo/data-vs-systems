@@ -1,0 +1,5 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+medium,postgresql_medium,ezr_pool,3,472.50 (16.68),35.61
+medium,postgresql_medium,flash_pool,1,485.33 (12.59),18.01
+medium,postgresql_medium,line_pool,3,474.35 (14.97),31.53
+medium,postgresql_medium,random_search_pool,2,477.58 (13.97),23.22

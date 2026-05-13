@@ -14,25 +14,25 @@ import pandas as pd
 # 1. User configuration
 # ============================================================
 
-SYSTEM = "mysql"
-SYSTEM_SCALE = "mysql_large"
+SYSTEM = "clang"
+SYSTEM_SCALE = "clang_large"
 
 FALLBACKS = [
     "1NN",
-    # "kNN",
-    # "kNNw",
-    # "loess",
+    "kNN",
+    "kNNw",
+    "loess",
     "rf",
-    # "dal_rf",
-    # "rf_uncertainty",
+    "dal_rf",
+    "rf_uncertainty",
 
 ]
 
 ALGORITHMS = [
-    # "smac",
+    "smac",
     "bestconfig",
-    # "flash",
-    # "ga",
+    "flash",
+    "ga",
     "hebo",
     "promisetune",
     "random_search",
@@ -419,8 +419,6 @@ def export_one_tex(fallback: str, all_stats: Dict[str, Dict[str, np.ndarray]]) -
       ylabel={{{get_ylabel(SYSTEM)}}},
       xmin={limits['xmin']:.4f}, xmax={limits['xmax']+20:.4f},
       ymin={limits['ymin']:.4f}, ymax={limits['ymax']:.4f},
-{xtick_line}
-{ytick_line}
       legend cell align=left,
       legend columns=1,
       legend style={{

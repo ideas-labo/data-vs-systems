@@ -336,7 +336,15 @@ def style_mean_cell(mean_text: str, in_best_rank_group: bool, is_best_mean: bool
 
 
 def generate_latex_table(root_dir: Path, out_path: Path, highlight_color: str = "yellow!25") -> None:
-    strategy_dirs = [d for d in sorted(root_dir.iterdir()) if d.is_dir() and (d / "scott_knott.csv").exists()]
+    # strategy_dirs = [d for d in sorted(root_dir.iterdir()) if d.is_dir() and (d / "scott_knott.csv").exists()]
+
+    strategy_dirs = [
+        d for d in sorted(root_dir.iterdir())
+        if d.is_dir()
+           and (d / "scott_knott.csv").exists()
+           and "pool" not in d.name.lower()
+    ]
+
     if not strategy_dirs:
         raise RuntimeError(f"No strategy folders with scott_knott.csv found under {root_dir}")
 

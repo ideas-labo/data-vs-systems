@@ -1,0 +1,5 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+medium,clang_medium,ezr_pool,3,67.17 (3.26),4.72
+medium,clang_medium,flash_pool,1,66.23 (1.60),1.98
+medium,clang_medium,line_pool,1,65.69 (2.19),2.59
+medium,clang_medium,random_search_pool,2,66.71 (3.01),4.76

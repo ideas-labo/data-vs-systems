@@ -1,0 +1,5 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+medium,gcc_medium,ezr_pool,1,66.59 (0.91),1.46
+medium,gcc_medium,flash_pool,2,67.79 (0.76),0.88
+medium,gcc_medium,line_pool,3,67.85 (1.25),0.96
+medium,gcc_medium,random_search_pool,1,67.10 (1.79),1.32

@@ -1,8 +1,8 @@
 Scale,Workload,Algorithm,r,Mean (Std),IQR
-small,mysql_small,flash,4,265.03 (0.40),0.75
-small,mysql_small,ga,6,246.47 (19.22),35.91
-small,mysql_small,smac,2,266.31 (0.57),0.87
-small,mysql_small,hebo,1,267.07 (0.40),0.46
-small,mysql_small,bestconfig,7,210.55 (0.48),0.65
-small,mysql_small,promisetune,3,266.13 (0.36),0.56
-small,mysql_small,random_search,5,259.79 (5.54),2.52
+small,mysql_small,flash,4,265.09 (0.47),0.86
+small,mysql_small,ga,6,248.68 (19.83),40.17
+small,mysql_small,smac,3,266.33 (0.63),1.20
+small,mysql_small,hebo,1,267.67 (0.47),0.75
+small,mysql_small,bestconfig,7,205.87 (0.32),0.34
+small,mysql_small,promisetune,2,266.52 (0.52),0.44
+small,mysql_small,random_search,5,261.05 (1.66),1.68

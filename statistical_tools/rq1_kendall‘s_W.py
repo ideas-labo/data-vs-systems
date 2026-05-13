@@ -242,6 +242,9 @@ def collect_strategy_tables(root_dir: Path) -> Dict[str, pd.DataFrame]:
     for child in sorted(root_dir.iterdir()):
         if not child.is_dir():
             continue
+        if 'pool' in child.name.lower():
+            print(f"[Skip] Ignoring folder with 'pool' in name: {child.name}")
+            continue
 
         csv_path = child / "scott_knott.csv"
         if not csv_path.exists():

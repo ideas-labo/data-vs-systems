@@ -1,0 +1,4 @@
+system,dataset,scale,file,performance_column,count,mean,std,min,q1,median,q3,max
+postgresql,postgresql_large,large,/Users/oliver/DataEval/datasets/postgresql/postgresql_large.csv,throughput,10000,359.50979099999995,56.72045372214788,15.66,326.2575,362.875,400.8725,501.73
+postgresql,postgresql_medium,medium,/Users/oliver/DataEval/datasets/postgresql/postgresql_medium.csv,throughput,5000,359.017914,56.97964696195128,15.66,325.11,363.15999999999997,400.47249999999997,501.73
+postgresql,postgresql_small,small,/Users/oliver/DataEval/datasets/postgresql/postgresql_small.csv,throughput,2500,358.83601999999996,57.219429874471835,28.5,325.57,361.80499999999995,399.6275,487.09

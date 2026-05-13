@@ -1,8 +1,8 @@
 Scale,Workload,Algorithm,r,Mean (Std),IQR
-large,x265_large,flash,3,5501.66 (0.00),0.00
-large,x265_large,ga,2,5501.66 (0.00),0.00
-large,x265_large,smac,5,5501.66 (0.00),0.00
+large,x265_large,flash,6,5501.66 (0.00),0.00
+large,x265_large,ga,4,5501.66 (0.00),0.00
+large,x265_large,smac,1,5501.66 (0.00),0.00
 large,x265_large,hebo,4,5501.66 (0.00),0.00
-large,x265_large,bestconfig,7,5501.66 (0.00),0.00
+large,x265_large,bestconfig,2,5501.66 (0.00),0.00
 large,x265_large,promisetune,6,5501.66 (0.00),0.00
-large,x265_large,random_search,1,5501.66 (0.00),0.00
+large,x265_large,random_search,3,5501.66 (0.00),0.00

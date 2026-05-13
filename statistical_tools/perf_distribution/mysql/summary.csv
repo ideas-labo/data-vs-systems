@@ -1,0 +1,4 @@
+system,dataset,scale,file,performance_column,count,mean,std,min,q1,median,q3,max
+mysql,mysql_large,large,/Users/oliver/DataEval/datasets/mysql/mysql_large.csv,throughput,9996,202.4055662264906,17.33183314440726,54.87,196.32,203.755,208.77,281.15
+mysql,mysql_medium,medium,/Users/oliver/DataEval/datasets/mysql/mysql_medium.csv,throughput,4998,202.03908763505402,17.172326634697544,56.51,195.8325,203.49,208.63,281.15
+mysql,mysql_small,small,/Users/oliver/DataEval/datasets/mysql/mysql_small.csv,throughput,2497,202.29545454545453,16.819922964564284,56.51,196.15,203.47,208.57,275.47

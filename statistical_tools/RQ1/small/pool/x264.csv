@@ -1,0 +1,5 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+small,x264_small,ezr_pool,2,8.98 (0.28),0.29
+small,x264_small,flash_pool,1,8.78 (0.11),0.04
+small,x264_small,line_pool,4,9.51 (0.23),0.29
+small,x264_small,random_search_pool,3,9.27 (0.30),0.27

@@ -1,8 +1,8 @@
 Scale,Workload,Algorithm,r,Mean (Std),IQR
-small,x265_small,flash,3,68.13 (3.24),3.58
-small,x265_small,ga,1,65.42 (4.01),2.67
-small,x265_small,smac,2,66.95 (3.93),5.71
-small,x265_small,hebo,1,59.18 (2.74),4.69
-small,x265_small,bestconfig,5,77.37 (3.07),4.78
-small,x265_small,promisetune,4,69.26 (3.86),2.90
-small,x265_small,random_search,6,77.68 (3.42),6.16
+small,x265_small,flash,2,66.77 (1.87),1.95
+small,x265_small,ga,1,66.01 (3.58),3.67
+small,x265_small,smac,3,68.06 (4.57),5.67
+small,x265_small,hebo,1,57.74 (1.04),0.74
+small,x265_small,bestconfig,5,77.84 (5.54),8.91
+small,x265_small,promisetune,2,67.64 (2.91),4.26
+small,x265_small,random_search,4,77.65 (5.99),9.19

@@ -1,8 +1,8 @@
 Scale,Workload,Algorithm,r,Mean (Std),IQR
-large,clang_large,flash,4,69.04 (21.63),10.83
-large,clang_large,ga,3,68.78 (22.23),5.61
-large,clang_large,smac,1,31.56 (37.99),76.01
-large,clang_large,hebo,2,32.62 (40.06),77.85
-large,clang_large,bestconfig,4,77.44 (4.90),4.54
-large,clang_large,promisetune,3,39.03 (38.50),76.08
-large,clang_large,random_search,4,72.98 (9.64),8.52
+large,clang_large,flash,6,78.61 (4.87),2.51
+large,clang_large,ga,4,55.68 (29.46),24.24
+large,clang_large,smac,1,11.15 (23.75),0.95
+large,clang_large,hebo,3,54.53 (35.69),59.47
+large,clang_large,bestconfig,5,72.86 (10.58),9.97
+large,clang_large,promisetune,2,47.57 (38.19),79.14
+large,clang_large,random_search,4,66.94 (21.17),5.10

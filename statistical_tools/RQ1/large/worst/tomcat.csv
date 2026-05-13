@@ -1,8 +1,8 @@
 Scale,Workload,Algorithm,r,Mean (Std),IQR
-large,tomcat_large,flash,1,0.01 (0.00),0.00
-large,tomcat_large,ga,1,0.01 (0.00),0.00
-large,tomcat_large,smac,1,0.01 (0.00),0.00
-large,tomcat_large,hebo,1,0.01 (0.00),0.00
-large,tomcat_large,bestconfig,1,0.01 (0.00),0.00
-large,tomcat_large,promisetune,1,0.01 (0.00),0.00
-large,tomcat_large,random_search,1,0.01 (0.00),0.00
+large,tomcat_large,flash,1,971.02 (0.00),0.00
+large,tomcat_large,ga,1,971.02 (0.00),0.00
+large,tomcat_large,smac,1,971.02 (0.00),0.00
+large,tomcat_large,hebo,1,971.02 (0.00),0.00
+large,tomcat_large,bestconfig,1,971.02 (0.00),0.00
+large,tomcat_large,promisetune,1,971.02 (0.00),0.00
+large,tomcat_large,random_search,1,971.02 (0.00),0.00
