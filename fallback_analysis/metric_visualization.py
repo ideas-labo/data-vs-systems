@@ -16,14 +16,26 @@ import matplotlib.pyplot as plt
 # ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent
-INPUT_DIR = BASE_DIR / "analysis_results" / "fallback_reconstruction"
+ACCURACY_INPUT_DIR = BASE_DIR / "accuracy"
+LANDSCAPE_INPUT_DIR = BASE_DIR / "landscape"
 OUTPUT_DIR = BASE_DIR / "visualization"
 
 # 只分析 large；如果你后面想分析 medium/small，可以改成 None 或对应列表
 TARGET_SCALE = "large"
 
 # 需要可视化的指标
-TARGET_METRICS = ["mre", "top5_overlap"]
+ACCURACY_METRICS = [
+    "mre",
+    "median_mre",
+    "p90_mre",
+    "top5_overlap",
+]
+
+LANDSCAPE_METRICS = [
+    "local_optima_ratio_abs_error",
+    "local_optima_count_abs_error",
+    "auto_correlation_abs_error",
+]
 
 # fallback 显示顺序
 FALLBACK_ORDER = [
@@ -51,8 +63,13 @@ def get_display_name(metric: str) -> str:
     """
     mapping = {
         "mre": "MRE",
+        "median_mre": "Median MRE",
+        "p90_mre": "P90 MRE",
         "mae": "MAE",
         "rmse": "RMSE",
+        "bias": "Bias",
+        "abs_bias": "Absolute Bias",
+        "error_std": "Error Std.",
         "nmae_iqr": "NMAE-IQR",
         "nrmse_iqr": "NRMSE-IQR",
         "top5_overlap": "Top-5% Overlap",
@@ -62,17 +79,21 @@ def get_display_name(metric: str) -> str:
         "spearman_perf": "Spearman",
         "kendall_perf": "Kendall",
         "pearson_perf": "Pearson",
+        "local_optima_ratio_abs_error": "Local Optima Ratio Abs. Error",
+        "local_optima_count_abs_error": "Local Optima Count Abs. Error",
+        "auto_correlation_abs_error": "Auto-correlation Abs. Error",
     }
     return mapping.get(metric, metric)
 
 
 def parse_system_scale_from_filename(csv_path: Path):
     """
-    Example:
-        clang_large_reconstruction_raw.csv
+    Examples:
+        clang_large_accuracy_metrics.csv
+        clang_large_landscape_metrics.csv
     -> system='clang', scale='large'
     """
-    name = csv_path.stem  # e.g., clang_large_reconstruction_raw
+    name = csv_path.stem
     parts = name.split("_")
 
     if len(parts) < 4:
@@ -81,6 +102,32 @@ def parse_system_scale_from_filename(csv_path: Path):
     system = parts[0]
     scale = parts[1]
     return system, scale
+
+
+def load_metric_group(input_dir: Path, suffix: str) -> dict[tuple[str, str], pd.DataFrame]:
+    grouped = {}
+    if not input_dir.exists():
+        print(f"[WARN] Input directory not found: {input_dir}")
+        return grouped
+
+    for csv_path in sorted(input_dir.glob(f"*/*_{suffix}.csv")):
+        try:
+            system, scale = parse_system_scale_from_filename(csv_path)
+        except ValueError:
+            continue
+
+        if TARGET_SCALE is not None and scale != TARGET_SCALE:
+            continue
+
+        df = pd.read_csv(csv_path)
+        key = (system, scale)
+        grouped.setdefault(key, []).append(df)
+
+    return {
+        key: pd.concat(frames, ignore_index=True)
+        for key, frames in grouped.items()
+        if frames
+    }
 
 
 def add_value_labels(ax, fmt: str = "{:.2f}") -> None:
@@ -192,49 +239,46 @@ def plot_metric_for_system(
 # ============================================================
 
 def main():
-    if not INPUT_DIR.exists():
-        raise FileNotFoundError(f"Input directory not found: {INPUT_DIR}")
+    metric_groups = [
+        (
+            "accuracy",
+            load_metric_group(ACCURACY_INPUT_DIR, "accuracy_metrics"),
+            ACCURACY_METRICS,
+        ),
+        (
+            "landscape",
+            load_metric_group(LANDSCAPE_INPUT_DIR, "landscape_metrics"),
+            LANDSCAPE_METRICS,
+        ),
+    ]
 
-    csv_files = sorted(INPUT_DIR.glob("*_reconstruction_raw.csv"))
-
-    if not csv_files:
-        print(f"[WARN] No raw reconstruction CSV files found in: {INPUT_DIR}")
-        return
-
-    for csv_path in csv_files:
-        try:
-            system, scale = parse_system_scale_from_filename(csv_path)
-        except ValueError:
-            # 跳过像 fallback_reconstruction_raw_all.csv 这种总表
+    for group_name, grouped_data, metrics in metric_groups:
+        if not grouped_data:
+            print(f"[WARN] No {group_name} metric CSV files found.")
             continue
 
-        if TARGET_SCALE is not None and scale != TARGET_SCALE:
-            continue
+        for (system, scale), df in grouped_data.items():
+            print(f"\n[PROCESS] {group_name}: {system}_{scale}")
 
-        print(f"\n[PROCESS] {csv_path.name}")
-
-        df = pd.read_csv(csv_path)
-
-        required_cols = {"fallback", "train_frac", "repeat"}
-        missing_required = required_cols - set(df.columns)
-        if missing_required:
-            print(f"[WARN] Missing required columns {missing_required} in {csv_path.name}")
-            continue
-
-        system_out_dir = OUTPUT_DIR / system
-
-        for metric in TARGET_METRICS:
-            if metric not in df.columns:
-                print(f"[WARN] Metric '{metric}' not found in {csv_path.name}, skip.")
+            required_cols = {"fallback", "train_frac", "repeat"}
+            missing_required = required_cols - set(df.columns)
+            if missing_required:
+                print(f"[WARN] Missing required columns {missing_required} for {group_name}:{system}_{scale}")
                 continue
 
-            plot_metric_for_system(
-                df=df,
-                system=system,
-                scale=scale,
-                metric=metric,
-                output_dir=system_out_dir,
-            )
+            system_out_dir = OUTPUT_DIR / group_name / system
+            for metric in metrics:
+                if metric not in df.columns:
+                    print(f"[WARN] Metric '{metric}' not found for {group_name}:{system}_{scale}, skip.")
+                    continue
+
+                plot_metric_for_system(
+                    df=df,
+                    system=system,
+                    scale=scale,
+                    metric=metric,
+                    output_dir=system_out_dir,
+                )
 
 
 if __name__ == "__main__":

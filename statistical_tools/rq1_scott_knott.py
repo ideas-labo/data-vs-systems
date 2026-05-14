@@ -290,7 +290,7 @@ def main():
             systems=systems,
             algorithms=compared_algorithms,
             runs=runs,
-            base_path='../results',
+            base_path='../results_dataset',
             estimation=estimation,
             out_root='RQ1',
             sk_pkg=sk

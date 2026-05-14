@@ -145,7 +145,7 @@ STYLE_MAP = {
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
-RESULTS_DIR = PROJECT_ROOT / "results"
+RESULTS_DIR = PROJECT_ROOT / "results_dataset"
 OUTPUT_DIR = SCRIPT_DIR / OUTPUT_FOLDER_NAME
 
 

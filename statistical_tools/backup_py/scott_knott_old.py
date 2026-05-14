@@ -25,7 +25,7 @@ def calculate_iqr(data):
     return q3 - q1
 
 
-def collect_data(systems, algorithms, runs, base_path='../results', estimation='worst'):
+def collect_data(systems, algorithms, runs, base_path='../results_dataset', estimation='worst'):
     os.makedirs(f"RQ1/{estimation}", exist_ok=True)
     all_result_list = []
 

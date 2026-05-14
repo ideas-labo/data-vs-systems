@@ -3,28 +3,34 @@
 
 from __future__ import annotations
 
-import os
-import math
 import random
+import sys
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
-from scipy.stats import spearmanr, kendalltau, pearsonr
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.neighbors import BallTree
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 # Adjust this import according to your project structure
 from utils.config_manager import ConfigManager
+import accuracy_metrics
+from landscape_metrics import compute_landscape_pair_metrics
 
 
 # ============================================================
 # User settings
 # ============================================================
 
-DATASET_ROOT = Path("../datasets")
-OUTPUT_DIR = Path("analysis_results/fallback_reconstruction")
+BASE_DIR = Path(__file__).resolve().parent
+DATASET_ROOT = BASE_DIR.parent / "datasets"
+ACCURACY_OUTPUT_DIR = BASE_DIR / "accuracy"
+LANDSCAPE_OUTPUT_DIR = BASE_DIR / "landscape"
 
 SYSTEMS = [
     "mysql",
@@ -58,9 +64,9 @@ FALLBACKS = [
 ]
 
 # Sparse ratios: percentage of the full tabular data used as observed data
-TRAIN_FRACS = [0.2]
+TRAIN_FRACS = [0.05]
 
-REPEATS = 3
+REPEATS = 10
 
 # k for kNN / kNNw
 KNN_K = 20
@@ -69,6 +75,33 @@ KNN_K = 20
 TOP_FRACS = [0.05, 0.10]
 
 MAXIMIZE_SYSTEMS = {"mysql", "postgresql", "httpd", "tomcat"}
+
+ID_COLS = ["system", "scale", "train_frac", "repeat", "fallback"]
+ACCURACY_COLS = [
+    "n_samples",
+    "mre",
+    "median_mre",
+    "p90_mre",
+    "mae",
+    "rmse",
+    "bias",
+    "abs_bias",
+    "error_std",
+    "nmae_iqr",
+    "nrmse_iqr",
+    "spearman_perf",
+    "kendall_perf",
+    "pearson_perf",
+    "top5_overlap",
+    "ndcg_top5",
+    "top10_overlap",
+    "ndcg_top10",
+]
+LANDSCAPE_ERROR_COLS = [
+    "local_optima_ratio_abs_error",
+    "local_optima_count_abs_error",
+    "auto_correlation_abs_error",
+]
 
 
 # ============================================================
@@ -82,185 +115,6 @@ def infer_optimization_goal(system: str) -> str:
     if system in MAXIMIZE_SYSTEMS:
         return "maximum"
     return "minimum"
-
-
-def objective_to_score(y: np.ndarray, system: str) -> np.ndarray:
-    """
-    Convert raw performance into a unified score:
-      larger score = better.
-    """
-    y = np.asarray(y, dtype=float)
-    if system in MAXIMIZE_SYSTEMS:
-        return y
-    else:
-        return -y
-
-
-def safe_corr(x: np.ndarray, y: np.ndarray, method: str) -> float:
-    """
-    Robust correlation calculation.
-    Return NaN when correlation is undefined.
-    """
-    x = np.asarray(x, dtype=float)
-    y = np.asarray(y, dtype=float)
-
-    mask = np.isfinite(x) & np.isfinite(y)
-    x = x[mask]
-    y = y[mask]
-
-    if len(x) < 2:
-        return float("nan")
-
-    if np.nanstd(x) == 0 or np.nanstd(y) == 0:
-        return float("nan")
-
-    try:
-        if method == "spearman":
-            r, _ = spearmanr(x, y)
-        elif method == "kendall":
-            r, _ = kendalltau(x, y)
-        elif method == "pearson":
-            r, _ = pearsonr(x, y)
-        else:
-            raise ValueError(f"Unknown correlation method: {method}")
-        return float(r)
-    except Exception:
-        return float("nan")
-
-
-def top_k_indices(scores: np.ndarray, k: int) -> np.ndarray:
-    """
-    Return indices of top-k items by descending score.
-    """
-    scores = np.asarray(scores, dtype=float)
-    k = max(1, min(k, len(scores)))
-    return np.argsort(-scores, kind="mergesort")[:k]
-
-
-def top_overlap(y_true_score: np.ndarray, y_pred_score: np.ndarray, top_frac: float) -> float:
-    """
-    Top-region overlap:
-      |Top true ∩ Top pred| / |Top true|
-    """
-    n = len(y_true_score)
-    if n == 0:
-        return float("nan")
-
-    k = max(1, int(math.ceil(n * top_frac)))
-
-    true_top = set(top_k_indices(y_true_score, k))
-    pred_top = set(top_k_indices(y_pred_score, k))
-
-    return float(len(true_top.intersection(pred_top)) / k)
-
-
-def ndcg_continuous(y_true_score: np.ndarray, y_pred_score: np.ndarray, top_frac: float) -> float:
-    """
-    NDCG over configurations.
-
-    Relevance is derived from normalized true score.
-    Larger true score = better.
-    Predicted score determines the ranking.
-    """
-    y_true_score = np.asarray(y_true_score, dtype=float)
-    y_pred_score = np.asarray(y_pred_score, dtype=float)
-
-    n = len(y_true_score)
-    if n == 0:
-        return float("nan")
-
-    k = max(1, int(math.ceil(n * top_frac)))
-
-    # Normalize true score into [0, 1] as continuous relevance
-    ymin = np.nanmin(y_true_score)
-    ymax = np.nanmax(y_true_score)
-    denom = ymax - ymin
-
-    if denom <= 1e-12:
-        return float("nan")
-
-    rel = (y_true_score - ymin) / denom
-
-    pred_order = np.argsort(-y_pred_score, kind="mergesort")[:k]
-    ideal_order = np.argsort(-y_true_score, kind="mergesort")[:k]
-
-    discounts = 1.0 / np.log2(np.arange(2, k + 2))
-
-    dcg = np.sum((2.0 ** rel[pred_order] - 1.0) * discounts)
-    idcg = np.sum((2.0 ** rel[ideal_order] - 1.0) * discounts)
-
-    if idcg <= 1e-12:
-        return float("nan")
-
-    return float(dcg / idcg)
-
-
-def compute_reconstruction_metrics(
-    y_true_raw: np.ndarray,
-    y_pred_raw: np.ndarray,
-    system: str,
-    top_fracs: List[float],
-) -> Dict[str, float]:
-    """
-    Compute sparse-to-full reconstruction metrics.
-
-    Raw performance is used for error metrics.
-    Direction-normalized score is used for ranking and top-region metrics.
-    """
-    y_true_raw = np.asarray(y_true_raw, dtype=float)
-    y_pred_raw = np.asarray(y_pred_raw, dtype=float)
-
-    mask = np.isfinite(y_true_raw) & np.isfinite(y_pred_raw)
-    y_true_raw = y_true_raw[mask]
-    y_pred_raw = y_pred_raw[mask]
-
-    if len(y_true_raw) == 0:
-        return {}
-
-    err = y_pred_raw - y_true_raw
-
-    # original error
-    mae = float(np.mean(np.abs(err)))
-    rmse = float(np.sqrt(np.mean(err ** 2)))
-
-    # normalizational error
-    iqr = float(np.percentile(y_true_raw, 75) - np.percentile(y_true_raw, 25))
-    std = float(np.std(y_true_raw))
-    value_range = float(np.max(y_true_raw) - np.min(y_true_raw))
-
-    denom_iqr = iqr if iqr > 1e-12 else value_range
-    denom_iqr = denom_iqr if denom_iqr > 1e-12 else 1.0
-
-    nmae_iqr = float(mae / denom_iqr)
-    nrmse_iqr = float(rmse / denom_iqr)
-
-    y_true_score = objective_to_score(y_true_raw, system)
-    y_pred_score = objective_to_score(y_pred_raw, system)
-
-    abs_err = np.abs(y_pred_raw - y_true_raw)
-    eps = 1e-12
-    denom = np.maximum(np.abs(y_true_raw), eps)
-    mre_each = abs_err / denom
-    mre = float(np.mean(mre_each) * 100.0)
-
-    metrics = {
-        "n_samples": int(len(y_true_raw)),
-        "mre": mre,
-        "mae": mae,
-        "rmse": rmse,
-        "nmae_iqr": nmae_iqr,
-        "nrmse_iqr": nrmse_iqr,
-        "spearman_perf": safe_corr(y_true_score, y_pred_score, "spearman"),
-        "kendall_perf": safe_corr(y_true_score, y_pred_score, "kendall"),
-        "pearson_perf": safe_corr(y_true_score, y_pred_score, "pearson"),
-    }
-
-    for frac in top_fracs:
-        tag = int(frac * 100)
-        metrics[f"top{tag}_overlap"] = top_overlap(y_true_score, y_pred_score, frac)
-        metrics[f"ndcg_top{tag}"] = ndcg_continuous(y_true_score, y_pred_score, frac)
-
-    return metrics
 
 
 # ============================================================
@@ -531,7 +385,7 @@ def run_one_dataset(
                     fallback=fallback,
                 )
 
-                metric_dict = compute_reconstruction_metrics(
+                metric_dict = accuracy_metrics.compute_reconstruction_metrics(
                     y_true_raw=y_true,
                     y_pred_raw=y_pred,
                     system=system,
@@ -541,6 +395,14 @@ def run_one_dataset(
                 if not metric_dict:
                     continue
 
+                maximize = infer_optimization_goal(system) == "maximum"
+                landscape_dict = compute_landscape_pair_metrics(
+                    configs=holdout_df.iloc[:, :-1],
+                    true_perfs=y_true,
+                    pred_perfs=y_pred,
+                    maximize=maximize,
+                )
+
                 row = {
                     "system": system,
                     "scale": scale,
@@ -549,6 +411,7 @@ def run_one_dataset(
                     "fallback": fallback,
                 }
                 row.update(metric_dict)
+                row.update(landscape_dict)
                 rows.append(row)
 
     return pd.DataFrame(rows)
@@ -582,13 +445,52 @@ def summarize_results(df: pd.DataFrame) -> pd.DataFrame:
     return summary
 
 
+def select_existing_columns(df: pd.DataFrame, columns: list[str]) -> list[str]:
+    return [col for col in columns if col in df.columns]
+
+
+def save_metric_outputs(result_df: pd.DataFrame, system: str, scale: str) -> None:
+    """
+    Save accuracy and landscape outputs under fallback-specific folders.
+    """
+    if result_df.empty:
+        return
+
+    landscape_raw_cols = [
+        col for col in result_df.columns
+        if col.startswith("true_")
+        or col.startswith("pred_")
+        or col in LANDSCAPE_ERROR_COLS
+    ]
+
+    for fallback, fb_df in result_df.groupby("fallback", sort=False):
+        accuracy_dir = ACCURACY_OUTPUT_DIR / fallback
+        landscape_dir = LANDSCAPE_OUTPUT_DIR / fallback
+        accuracy_dir.mkdir(parents=True, exist_ok=True)
+        landscape_dir.mkdir(parents=True, exist_ok=True)
+
+        accuracy_cols = select_existing_columns(fb_df, ID_COLS + ACCURACY_COLS)
+        accuracy_path = accuracy_dir / f"{system}_{scale}_accuracy_metrics.csv"
+        fb_df[accuracy_cols].to_csv(accuracy_path, index=False)
+        print(f"[SAVE] {accuracy_path}")
+
+        landscape_error_cols = select_existing_columns(fb_df, ID_COLS + LANDSCAPE_ERROR_COLS)
+        landscape_path = landscape_dir / f"{system}_{scale}_landscape_metrics.csv"
+        fb_df[landscape_error_cols].to_csv(landscape_path, index=False)
+        print(f"[SAVE] {landscape_path}")
+
+        landscape_raw_path = landscape_dir / f"{system}_{scale}_landscape_raw.csv"
+        landscape_raw_cols_existing = select_existing_columns(fb_df, ID_COLS + landscape_raw_cols)
+        fb_df[landscape_raw_cols_existing].to_csv(landscape_raw_path, index=False)
+        print(f"[SAVE] {landscape_raw_path}")
+
+
 def main():
     random.seed(0)
     np.random.seed(0)
 
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    all_rows = []
+    ACCURACY_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    LANDSCAPE_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     for system in SYSTEMS:
         for scale in SCALES:
@@ -613,27 +515,7 @@ def main():
             if result_df.empty:
                 continue
 
-            out_path = OUTPUT_DIR / f"{system}_{scale}_reconstruction_raw.csv"
-            result_df.to_csv(out_path, index=False)
-            print(f"[SAVE] {out_path}")
-
-            all_rows.append(result_df)
-
-    if all_rows:
-        all_df = pd.concat(all_rows, ignore_index=True)
-
-        raw_path = OUTPUT_DIR / "fallback_reconstruction_raw_all.csv"
-        all_df.to_csv(raw_path, index=False)
-        print(f"[SAVE] {raw_path}")
-
-        summary_df = summarize_results(all_df)
-
-        summary_path = OUTPUT_DIR / "fallback_reconstruction_summary.csv"
-        summary_df.to_csv(summary_path, index=False)
-        print(f"[SAVE] {summary_path}")
-
-    else:
-        print("[WARN] No results generated.")
+            save_metric_outputs(result_df, system, scale)
 
 
 if __name__ == "__main__":
