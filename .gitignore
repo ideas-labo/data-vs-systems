@@ -59,6 +59,7 @@ Thumbs.db
 # =========================
 .idea/
 .vscode/
+.codex/
 
 # =========================
 # Python version / local config

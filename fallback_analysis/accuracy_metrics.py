@@ -7,7 +7,14 @@ import math
 from typing import Dict, List
 
 import numpy as np
-from scipy.stats import kendalltau, pearsonr, spearmanr
+import pandas as pd
+
+try:
+    from scipy.stats import kendalltau, pearsonr, spearmanr
+except ModuleNotFoundError:
+    kendalltau = None
+    pearsonr = None
+    spearmanr = None
 
 
 MAXIMIZE_SYSTEMS = {"mysql", "postgresql", "httpd", "tomcat"}
@@ -33,11 +40,21 @@ def safe_corr(x: np.ndarray, y: np.ndarray, method: str) -> float:
 
     try:
         if method == "spearman":
-            r, _ = spearmanr(x, y)
+            if spearmanr is not None:
+                r, _ = spearmanr(x, y)
+            else:
+                rx = pd.Series(x).rank(method="average").to_numpy(dtype=float)
+                ry = pd.Series(y).rank(method="average").to_numpy(dtype=float)
+                r = np.corrcoef(rx, ry)[0, 1]
         elif method == "kendall":
+            if kendalltau is None:
+                return float("nan")
             r, _ = kendalltau(x, y)
         elif method == "pearson":
-            r, _ = pearsonr(x, y)
+            if pearsonr is not None:
+                r, _ = pearsonr(x, y)
+            else:
+                r = np.corrcoef(x, y)[0, 1]
         else:
             raise ValueError(f"Unknown correlation method: {method}")
         return float(r)

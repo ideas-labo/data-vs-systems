@@ -26,8 +26,8 @@ TARGET_SCALE = "large"
 # 需要可视化的指标
 ACCURACY_METRICS = [
     "mre",
-    "median_mre",
-    "p90_mre",
+    # "median_mre",
+    # "p90_mre",
     "top5_overlap",
 ]
 

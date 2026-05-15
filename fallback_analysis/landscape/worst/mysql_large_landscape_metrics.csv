@@ -1,4 +1,3 @@
 system,scale,train_frac,repeat,fallback,local_optima_ratio_abs_error,local_optima_count_abs_error,auto_correlation_abs_error
 mysql,large,0.05,0,worst,0.024667931688804545,234.0,0.19533171803535299
-mysql,large,0.05,1,worst,0.019818680160236142,188.0,0.17988838816466923
-mysql,large,0.05,2,worst,0.02076525772109202,197.0,0.18604692469517423
+mysql,large,0.05,1,worst,0.019818680160236142,188.0,0.17988838816469094

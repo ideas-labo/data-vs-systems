@@ -7,7 +7,11 @@ from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
-from scipy.spatial import cKDTree
+
+try:
+    from scipy.spatial import cKDTree
+except ModuleNotFoundError:
+    cKDTree = None
 
 
 def _nan_metrics() -> Dict[str, float]:
@@ -96,13 +100,43 @@ def encode_configs_for_distance(configs) -> np.ndarray:
     return np.hstack(non_empty_cols).astype(float)
 
 
-def _build_tree(encoded_configs: np.ndarray) -> Optional[cKDTree]:
+def _build_tree(encoded_configs: np.ndarray):
     if encoded_configs.shape[0] < 2 or encoded_configs.shape[1] == 0:
+        return None
+    if cKDTree is None:
         return None
     return cKDTree(encoded_configs)
 
 
-def _average_neighbor_count(tree: cKDTree, encoded_configs: np.ndarray, radius: float) -> float:
+def _chunk_size(n: int, dim: int, target_elements: int = 20_000_000) -> int:
+    denom = max(1, n * max(1, dim))
+    return max(1, min(n, target_elements // denom))
+
+
+def _distance_chunk(chunk: np.ndarray, encoded_configs: np.ndarray) -> np.ndarray:
+    return np.abs(chunk[:, None, :] - encoded_configs[None, :, :]).sum(axis=2)
+
+
+def _average_neighbor_count_bruteforce(encoded_configs: np.ndarray, radius: float) -> float:
+    n, dim = encoded_configs.shape
+    if n < 2 or dim == 0:
+        return float("nan")
+
+    chunk_size = _chunk_size(n, dim)
+    counts = []
+    for start in range(0, n, chunk_size):
+        chunk = encoded_configs[start:start + chunk_size]
+        distances = _distance_chunk(chunk, encoded_configs)
+        counts.extend((np.sum(distances <= radius, axis=1) - 1).tolist())
+
+    counts = np.asarray(counts, dtype=float)
+    return float(np.mean(np.maximum(counts, 0.0))) if len(counts) else float("nan")
+
+
+def _average_neighbor_count(tree, encoded_configs: np.ndarray, radius: float) -> float:
+    if tree is None:
+        return _average_neighbor_count_bruteforce(encoded_configs, radius)
+
     try:
         counts = tree.query_ball_point(
             encoded_configs,
@@ -173,7 +207,17 @@ def build_neighbor_graph(encoded_configs: np.ndarray, radius: float) -> List[np.
 
     tree = _build_tree(encoded_configs)
     if tree is None:
-        return [np.asarray([], dtype=int) for _ in range(n)]
+        graph = []
+        dim = encoded_configs.shape[1]
+        chunk_size = _chunk_size(n, dim)
+        for start in range(0, n, chunk_size):
+            chunk = encoded_configs[start:start + chunk_size]
+            distances = _distance_chunk(chunk, encoded_configs)
+            for local_idx in range(distances.shape[0]):
+                idx = start + local_idx
+                neighbors = np.where(distances[local_idx] <= radius)[0]
+                graph.append(np.asarray([j for j in neighbors if j != idx], dtype=int))
+        return graph
 
     raw_neighbors = tree.query_ball_point(encoded_configs, r=radius, p=1)
 

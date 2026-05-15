@@ -3,10 +3,11 @@
 
 from __future__ import annotations
 
+from concurrent.futures import ProcessPoolExecutor, as_completed
 import random
 import sys
 from pathlib import Path
-from typing import Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -19,8 +20,6 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # Adjust this import according to your project structure
 from utils.config_manager import ConfigManager
-import accuracy_metrics
-from landscape_metrics import compute_landscape_pair_metrics
 
 
 # ============================================================
@@ -29,8 +28,7 @@ from landscape_metrics import compute_landscape_pair_metrics
 
 BASE_DIR = Path(__file__).resolve().parent
 DATASET_ROOT = BASE_DIR.parent / "datasets"
-ACCURACY_OUTPUT_DIR = BASE_DIR / "accuracy"
-LANDSCAPE_OUTPUT_DIR = BASE_DIR / "landscape"
+PREDICTION_OUTPUT_DIR = BASE_DIR / "predictions"
 
 SYSTEMS = [
     "mysql",
@@ -68,40 +66,19 @@ TRAIN_FRACS = [0.05]
 
 REPEATS = 10
 
+# One repeat is an independent split. Use up to REPEATS workers by default.
+MAX_WORKERS: Optional[int] = REPEATS
+
+# Avoid nested parallelism when multiple repeat workers run at the same time.
+SURROGATE_N_JOBS = 1
+
 # k for kNN / kNNw
 KNN_K = 20
-
-# top-region metrics
-TOP_FRACS = [0.05, 0.10]
 
 MAXIMIZE_SYSTEMS = {"mysql", "postgresql", "httpd", "tomcat"}
 
 ID_COLS = ["system", "scale", "train_frac", "repeat", "fallback"]
-ACCURACY_COLS = [
-    "n_samples",
-    "mre",
-    "median_mre",
-    "p90_mre",
-    "mae",
-    "rmse",
-    "bias",
-    "abs_bias",
-    "error_std",
-    "nmae_iqr",
-    "nrmse_iqr",
-    "spearman_perf",
-    "kendall_perf",
-    "pearson_perf",
-    "top5_overlap",
-    "ndcg_top5",
-    "top10_overlap",
-    "ndcg_top10",
-]
-LANDSCAPE_ERROR_COLS = [
-    "local_optima_ratio_abs_error",
-    "local_optima_count_abs_error",
-    "auto_correlation_abs_error",
-]
+PREDICTION_ID_COLS = ID_COLS + ["true_perf", "pred_perf"]
 
 
 # ============================================================
@@ -254,7 +231,7 @@ def prefit_fallback_if_needed(cm: ConfigManager, fallback: str, seed: int) -> No
             cm.fit_random_forest(
                 n_estimators=300,
                 random_state=seed,
-                n_jobs=-1,
+                n_jobs=SURROGATE_N_JOBS,
             )
 
         elif fallback == "dal_rf":
@@ -351,9 +328,9 @@ def run_one_dataset(
     full_df: pd.DataFrame,
 ) -> pd.DataFrame:
     """
-    Run sparse-to-full reconstruction analysis for one system-scale dataset.
+    Run fallback prediction collection for one system-scale dataset.
     """
-    rows = []
+    prediction_rows = []
 
     for train_frac in TRAIN_FRACS:
         for repeat in range(REPEATS):
@@ -385,112 +362,208 @@ def run_one_dataset(
                     fallback=fallback,
                 )
 
-                metric_dict = accuracy_metrics.compute_reconstruction_metrics(
-                    y_true_raw=y_true,
-                    y_pred_raw=y_pred,
-                    system=system,
-                    top_fracs=TOP_FRACS,
-                )
+                pred_df = holdout_df.copy()
+                pred_df = pred_df.rename(columns={holdout_df.columns[-1]: "true_perf"})
+                pred_df["pred_perf"] = y_pred
+                pred_df.insert(0, "fallback", fallback)
+                pred_df.insert(0, "repeat", repeat)
+                pred_df.insert(0, "train_frac", train_frac)
+                pred_df.insert(0, "scale", scale)
+                pred_df.insert(0, "system", system)
+                prediction_rows.append(pred_df)
 
-                if not metric_dict:
-                    continue
-
-                maximize = infer_optimization_goal(system) == "maximum"
-                landscape_dict = compute_landscape_pair_metrics(
-                    configs=holdout_df.iloc[:, :-1],
-                    true_perfs=y_true,
-                    pred_perfs=y_pred,
-                    maximize=maximize,
-                )
-
-                row = {
-                    "system": system,
-                    "scale": scale,
-                    "train_frac": train_frac,
-                    "repeat": repeat,
-                    "fallback": fallback,
-                }
-                row.update(metric_dict)
-                row.update(landscape_dict)
-                rows.append(row)
-
-    return pd.DataFrame(rows)
-
-
-def summarize_results(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Aggregate repeated splits.
-    """
-    group_cols = ["system", "scale", "train_frac", "fallback"]
-
-    metric_cols = [
-        c for c in df.columns
-        if c not in group_cols + ["repeat"]
-    ]
-
-    summary = (
-        df.groupby(group_cols)[metric_cols]
-        .agg(["mean", "std"])
-        .reset_index()
+    return (
+        pd.concat(prediction_rows, ignore_index=True)
+        if prediction_rows
+        else pd.DataFrame()
     )
 
-    # Flatten MultiIndex columns
-    summary.columns = [
-        "_".join([str(x) for x in col if str(x) != ""])
-        if isinstance(col, tuple)
-        else col
-        for col in summary.columns
-    ]
 
-    return summary
+def prediction_frame_from_arrays(
+    system: str,
+    scale: str,
+    train_frac: float,
+    repeat: int,
+    fallback: str,
+    holdout_df: pd.DataFrame,
+    y_pred: np.ndarray,
+) -> pd.DataFrame:
+    pred_df = holdout_df.copy()
+    pred_df = pred_df.rename(columns={holdout_df.columns[-1]: "true_perf"})
+    pred_df["pred_perf"] = y_pred
+    pred_df.insert(0, "fallback", fallback)
+    pred_df.insert(0, "repeat", repeat)
+    pred_df.insert(0, "train_frac", train_frac)
+    pred_df.insert(0, "scale", scale)
+    pred_df.insert(0, "system", system)
+    return pred_df
+
+
+def run_one_repeat(
+    system: str,
+    scale: str,
+    full_df: pd.DataFrame,
+    train_frac: float,
+    repeat: int,
+) -> pd.DataFrame:
+    seed = 1000 + repeat
+    train_df, holdout_df = sample_sparse_split(
+        full_df,
+        train_frac=train_frac,
+        seed=seed,
+    )
+
+    prediction_rows = []
+    for fallback in FALLBACKS:
+        print(
+            f"[RUN] system={system}, scale={scale}, "
+            f"train_frac={train_frac}, repeat={repeat}, fallback={fallback}"
+        )
+
+        cm = build_sparse_config_manager(
+            system=system,
+            train_df=train_df,
+            full_df=full_df,
+        )
+
+        prefit_fallback_if_needed(cm, fallback, seed)
+
+        _, y_pred = predict_holdout(
+            cm=cm,
+            holdout_df=holdout_df,
+            fallback=fallback,
+        )
+
+        prediction_rows.append(
+            prediction_frame_from_arrays(
+                system=system,
+                scale=scale,
+                train_frac=train_frac,
+                repeat=repeat,
+                fallback=fallback,
+                holdout_df=holdout_df,
+                y_pred=y_pred,
+            )
+        )
+
+    return (
+        pd.concat(prediction_rows, ignore_index=True)
+        if prediction_rows
+        else pd.DataFrame()
+    )
+
+
+def run_one_dataset_parallel(
+    system: str,
+    scale: str,
+    full_df: pd.DataFrame,
+    max_workers: Optional[int] = MAX_WORKERS,
+) -> pd.DataFrame:
+    jobs = [
+        (train_frac, repeat)
+        for train_frac in TRAIN_FRACS
+        for repeat in range(REPEATS)
+    ]
+    if not jobs:
+        return pd.DataFrame()
+
+    worker_count = max_workers or min(REPEATS, len(jobs))
+    worker_count = max(1, min(worker_count, len(jobs)))
+
+    print(f"[INFO] Running {len(jobs)} repeat jobs with {worker_count} workers.")
+    prediction_rows = []
+
+    if worker_count == 1:
+        for train_frac, repeat in jobs:
+            repeat_df = run_one_repeat(system, scale, full_df, train_frac, repeat)
+            print(
+                f"[DONE] system={system}, scale={scale}, "
+                f"train_frac={train_frac}, repeat={repeat}, rows={len(repeat_df)}"
+            )
+            if not repeat_df.empty:
+                prediction_rows.append(repeat_df)
+    else:
+        try:
+            with ProcessPoolExecutor(max_workers=worker_count) as executor:
+                future_to_job = {
+                    executor.submit(
+                        run_one_repeat,
+                        system,
+                        scale,
+                        full_df,
+                        train_frac,
+                        repeat,
+                    ): (train_frac, repeat)
+                    for train_frac, repeat in jobs
+                }
+
+                for future in as_completed(future_to_job):
+                    train_frac, repeat = future_to_job[future]
+                    try:
+                        repeat_df = future.result()
+                    except Exception as exc:
+                        print(
+                            f"[ERROR] repeat job failed: system={system}, scale={scale}, "
+                            f"train_frac={train_frac}, repeat={repeat}: {exc}"
+                        )
+                        raise
+
+                    print(
+                        f"[DONE] system={system}, scale={scale}, "
+                        f"train_frac={train_frac}, repeat={repeat}, rows={len(repeat_df)}"
+                    )
+                    if not repeat_df.empty:
+                        prediction_rows.append(repeat_df)
+        except (OSError, PermissionError) as exc:
+            print(f"[WARN] Process pool unavailable ({exc}); falling back to sequential execution.")
+            for train_frac, repeat in jobs:
+                repeat_df = run_one_repeat(system, scale, full_df, train_frac, repeat)
+                print(
+                    f"[DONE] system={system}, scale={scale}, "
+                    f"train_frac={train_frac}, repeat={repeat}, rows={len(repeat_df)}"
+                )
+                if not repeat_df.empty:
+                    prediction_rows.append(repeat_df)
+
+    return (
+        pd.concat(prediction_rows, ignore_index=True)
+        if prediction_rows
+        else pd.DataFrame()
+    )
 
 
 def select_existing_columns(df: pd.DataFrame, columns: list[str]) -> list[str]:
     return [col for col in columns if col in df.columns]
 
 
-def save_metric_outputs(result_df: pd.DataFrame, system: str, scale: str) -> None:
+def save_prediction_outputs(prediction_df: pd.DataFrame, system: str, scale: str) -> None:
     """
-    Save accuracy and landscape outputs under fallback-specific folders.
+    Save holdout configs, true performance, and fallback predictions.
     """
-    if result_df.empty:
+    if prediction_df.empty:
         return
 
-    landscape_raw_cols = [
-        col for col in result_df.columns
-        if col.startswith("true_")
-        or col.startswith("pred_")
-        or col in LANDSCAPE_ERROR_COLS
-    ]
+    for fallback, fb_df in prediction_df.groupby("fallback", sort=False):
+        pred_dir = PREDICTION_OUTPUT_DIR / fallback
+        pred_dir.mkdir(parents=True, exist_ok=True)
 
-    for fallback, fb_df in result_df.groupby("fallback", sort=False):
-        accuracy_dir = ACCURACY_OUTPUT_DIR / fallback
-        landscape_dir = LANDSCAPE_OUTPUT_DIR / fallback
-        accuracy_dir.mkdir(parents=True, exist_ok=True)
-        landscape_dir.mkdir(parents=True, exist_ok=True)
+        config_cols = [
+            col for col in fb_df.columns
+            if col not in set(PREDICTION_ID_COLS)
+        ]
+        out_cols = ID_COLS + config_cols + ["true_perf", "pred_perf"]
+        out_cols = select_existing_columns(fb_df, out_cols)
 
-        accuracy_cols = select_existing_columns(fb_df, ID_COLS + ACCURACY_COLS)
-        accuracy_path = accuracy_dir / f"{system}_{scale}_accuracy_metrics.csv"
-        fb_df[accuracy_cols].to_csv(accuracy_path, index=False)
-        print(f"[SAVE] {accuracy_path}")
-
-        landscape_error_cols = select_existing_columns(fb_df, ID_COLS + LANDSCAPE_ERROR_COLS)
-        landscape_path = landscape_dir / f"{system}_{scale}_landscape_metrics.csv"
-        fb_df[landscape_error_cols].to_csv(landscape_path, index=False)
-        print(f"[SAVE] {landscape_path}")
-
-        landscape_raw_path = landscape_dir / f"{system}_{scale}_landscape_raw.csv"
-        landscape_raw_cols_existing = select_existing_columns(fb_df, ID_COLS + landscape_raw_cols)
-        fb_df[landscape_raw_cols_existing].to_csv(landscape_raw_path, index=False)
-        print(f"[SAVE] {landscape_raw_path}")
+        pred_path = pred_dir / f"{system}_{scale}_predictions.csv"
+        fb_df[out_cols].to_csv(pred_path, index=False)
+        print(f"[SAVE] {pred_path}")
 
 
 def main():
     random.seed(0)
     np.random.seed(0)
 
-    ACCURACY_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    LANDSCAPE_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    PREDICTION_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     for system in SYSTEMS:
         for scale in SCALES:
@@ -506,16 +579,16 @@ def main():
 
             full_df = pd.read_csv(csv_path)
 
-            result_df = run_one_dataset(
+            prediction_df = run_one_dataset_parallel(
                 system=system,
                 scale=scale,
                 full_df=full_df,
             )
 
-            if result_df.empty:
+            if prediction_df.empty:
                 continue
 
-            save_metric_outputs(result_df, system, scale)
+            save_prediction_outputs(prediction_df, system, scale)
 
 
 if __name__ == "__main__":
