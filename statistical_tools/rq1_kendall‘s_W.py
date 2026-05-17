@@ -42,8 +42,46 @@ from typing import Dict, Tuple
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from scipy.stats import chi2
+
+try:
+    from scipy.stats import chi2
+except ModuleNotFoundError:
+    chi2 = None
+
+try:
+    import matplotlib.pyplot as plt
+except ModuleNotFoundError:
+    plt = None
+
+
+DEFAULT_STRATEGY_ORDER = [
+    "worst",
+    "1NN",
+    "kNN",
+    "kNNw",
+    "loess",
+    "rf",
+    "dal_rf",
+    "rf_uncertainty",
+]
+
+SYSTEM_ORDER = [
+    "mysql",
+    "postgresql",
+    "httpd",
+    "tomcat",
+    "gcc",
+    "clang",
+    "x264",
+    "x265",
+]
+
+
+def sort_by_preferred_order(values, preferred):
+    value_set = set(values)
+    ordered = [v for v in preferred if v in value_set]
+    ordered += sorted(v for v in values if v not in set(ordered))
+    return ordered
 
 
 def clean_text(x) -> str:
@@ -211,7 +249,7 @@ def kendalls_w_tie_corrected(rank_df: pd.DataFrame) -> Tuple[float, float, pd.Da
 
     # Chi-square approximation
     chi_square = n_judges * (n_items - 1) * W
-    p_value = chi2.sf(chi_square, df=n_items - 1)
+    p_value = chi2.sf(chi_square, df=n_items - 1) if chi2 is not None else np.nan
 
     return float(W), float(p_value), midrank_df
 
@@ -268,7 +306,10 @@ def analyze_kendalls_w(root_dir: Path, out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     strategy_tables = collect_strategy_tables(root_dir)
-    strategies = sorted(strategy_tables.keys())
+    strategies = sort_by_preferred_order(strategy_tables.keys(), DEFAULT_STRATEGY_ORDER)
+
+    if chi2 is None:
+        print("[Skip] scipy is not installed; p_value will be NaN.")
 
     # Find common systems across all strategies
     common_systems = None
@@ -326,7 +367,21 @@ def analyze_kendalls_w(root_dir: Path, out_dir: Path) -> None:
     if not results:
         raise RuntimeError("No Kendall's W results were successfully computed.")
 
-    results_df = pd.DataFrame(results).sort_values("system")
+    results_df = pd.DataFrame(results)
+    existing = set(results_df["system"].astype(str))
+    ordered_systems = [s for s in SYSTEM_ORDER if s in existing]
+    remaining_systems = [
+        s for s in results_df["system"].astype(str).tolist()
+        if s not in ordered_systems
+    ]
+    final_order = ordered_systems + remaining_systems
+
+    results_df["system"] = pd.Categorical(
+        results_df["system"].astype(str),
+        categories=final_order,
+        ordered=True,
+    )
+    results_df = results_df.sort_values("system").reset_index(drop=True)
     results_df.to_csv(out_dir / "kendalls_w_by_system.csv", index=False)
 
     # Summary text
@@ -345,64 +400,35 @@ def analyze_kendalls_w(root_dir: Path, out_dir: Path) -> None:
         f.write(f"Max  Kendall's W: {max_w:.4f}\n")
 
     # Bar plot
-    plt.figure(figsize=(10, 5))
-    bars = plt.bar(results_df["system"], results_df["kendalls_w"])
-    plt.ylim(0, 1.0)
-    plt.ylabel("Kendall's W")
-    plt.xlabel("System")
-    plt.title("Ranking Agreement Across Strategies")
-    plt.grid(axis="y", linestyle="--", alpha=0.4)
+    if plt is None:
+        print("[Skip] matplotlib is not installed; skipping kendalls_w_barplot.png.")
+    else:
+        plt.figure(figsize=(10, 5))
+        bars = plt.bar(results_df["system"].astype(str), results_df["kendalls_w"])
+        plt.ylim(0, 1.0)
+        plt.ylabel("Kendall's W")
+        plt.xlabel("System")
+        plt.title("Ranking Agreement Across Strategies")
+        plt.grid(axis="y", linestyle="--", alpha=0.4)
 
-    for bar, w in zip(bars, results_df["kendalls_w"]):
-        plt.text(
-            bar.get_x() + bar.get_width() / 2.0,
-            min(w + 0.02, 0.98),
-            f"{w:.2f}",
-            ha="center",
-            va="bottom",
-            fontsize=9,
-        )
+        for bar, w in zip(bars, results_df["kendalls_w"]):
+            plt.text(
+                bar.get_x() + bar.get_width() / 2.0,
+                min(w + 0.02, 0.98),
+                f"{w:.2f}",
+                ha="center",
+                va="bottom",
+                fontsize=9,
+            )
 
-    plt.tight_layout()
-    plt.savefig(out_dir / "kendalls_w_barplot.png", dpi=300)
-    plt.close()
+        plt.tight_layout()
+        plt.savefig(out_dir / "kendalls_w_barplot.png", dpi=300)
+        plt.close()
 
     print("\n=== Summary ===")
     print(results_df.to_string(index=False))
     print(f"\nMean Kendall's W: {mean_w:.4f}")
     print(f"Results saved to: {out_dir}")
-
-
-
-    # keep only systems that appear in both the dataframe and your desired order
-    system_order = [
-        "mysql",
-        "postgresql",
-        "httpd",
-        "tomcat",
-        "gcc",
-        "clang",
-        "x264",
-        "x265",
-    ]
-    existing = set(results_df["system"].astype(str))
-    ordered_systems = [s for s in system_order if s in existing]
-
-    # optionally append any unexpected systems to the end
-    remaining_systems = [
-        s for s in results_df["system"].astype(str).tolist()
-        if s not in ordered_systems
-    ]
-
-    final_order = ordered_systems + remaining_systems
-
-    results_df = results_df.copy()
-    results_df["system"] = pd.Categorical(
-        results_df["system"].astype(str),
-        categories=final_order,
-        ordered=True,
-    )
-    results_df = results_df.sort_values("system").reset_index(drop=True)
 
     tex_path = save_kendalls_w_barplot_tex(results_df, out_dir)
 
@@ -556,4 +582,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -39,7 +39,11 @@ from typing import Dict, List
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+
+try:
+    import matplotlib.pyplot as plt
+except ModuleNotFoundError:
+    plt = None
 
 
 ALGORITHM_ORDER = [
@@ -53,6 +57,7 @@ ALGORITHM_ORDER = [
 ]
 
 STRATEGY_ORDER = [
+    "worst",
     "1NN",
     "kNN",
     "kNNw",
@@ -60,6 +65,17 @@ STRATEGY_ORDER = [
     "rf",
     "dal_rf",
     "rf_uncertainty",
+]
+
+SYSTEM_ORDER = [
+    "mysql",
+    "postgresql",
+    "httpd",
+    "tomcat",
+    "gcc",
+    "clang",
+    "x264",
+    "x265",
 ]
 
 
@@ -173,7 +189,9 @@ def get_common_systems(strategy_tables: Dict[str, pd.DataFrame]) -> List[str]:
     if not common_systems:
         raise RuntimeError("No common systems found across all strategies.")
 
-    return sorted(common_systems)
+    ordered = [s for s in SYSTEM_ORDER if s in common_systems]
+    extras = sorted(common_systems - set(SYSTEM_ORDER))
+    return ordered + extras
 
 
 def get_common_algorithms(strategy_tables: Dict[str, pd.DataFrame]) -> List[str]:
@@ -225,7 +243,7 @@ def compute_average_ranks(
 def compute_overall_order(avg_rank_df: pd.DataFrame) -> pd.DataFrame:
     """
     For each strategy, sort algorithms by average rank (smaller is better).
-    Tie-breaking follows the predefined algorithm order.
+    Tied average ranks are kept in the same position group.
     """
     alg_pos = {alg: i for i, alg in enumerate(avg_rank_df.index.tolist())}
     rows = []
@@ -234,14 +252,14 @@ def compute_overall_order(avg_rank_df: pd.DataFrame) -> pd.DataFrame:
         s = avg_rank_df[strategy]
         valid = s.dropna()
 
-        ordered = sorted(
-            valid.index.tolist(),
-            key=lambda alg: (valid.loc[alg], alg_pos.get(alg, 10**9))
-        )
-
         row = {"strategy": strategy}
-        for i, alg in enumerate(ordered, start=1):
-            row[f"pos_{i}"] = alg
+        unique_vals = sorted(valid.unique())
+        for i, val in enumerate(unique_vals, start=1):
+            tied_algs = sorted(
+                valid.index[valid == val].tolist(),
+                key=lambda alg: alg_pos.get(alg, 10**9)
+            )
+            row[f"pos_{i}"] = "; ".join(tied_algs)
         rows.append(row)
 
     return pd.DataFrame(rows)
@@ -313,6 +331,10 @@ def plot_heatmap(avg_rank_df: pd.DataFrame, out_path: Path) -> None:
 
     Keep the user-specified order directly.
     """
+    if plt is None:
+        print("[Skip] matplotlib is not installed; skipping average_rank_heatmap.png.")
+        return
+
     plot_df = avg_rank_df.copy()
     data = plot_df.values
 

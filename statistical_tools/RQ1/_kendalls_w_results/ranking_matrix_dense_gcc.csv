@@ -1,8 +1,8 @@
-,1NN,dal_rf,kNN,kNNw,loess,rf,rf_uncertainty,worst
-bestconfig,3,6,2,2,5,6,2,5.0
-flash,1,5,3,3,3,5,3,4.0
-ga,2,4,1,2,2,4,2,1.0
-hebo,1,3,3,4,4,2,1,1.0
-promisetune,3,1,2,1,3,3,3,5.0
-random_search,1,6,3,2,4,6,4,2.0
-smac,1,2,1,1,1,1,1,3.0
+,worst,1NN,kNN,kNNw,loess,rf,dal_rf,rf_uncertainty
+bestconfig,1,3,2,2,5,6,6,2
+flash,1,1,3,3,3,5,5,3
+ga,1,2,1,2,2,4,4,2
+hebo,1,1,3,4,4,2,3,1
+promisetune,1,3,2,1,3,3,1,3
+random_search,1,1,3,2,4,6,6,4
+smac,1,1,1,1,1,1,2,1

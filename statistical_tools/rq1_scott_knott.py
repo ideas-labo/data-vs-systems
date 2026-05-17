@@ -72,7 +72,7 @@ def list_workloads(base_path, estimation, algo, any_system, probe_run=0):
 #     return {a: int(r) for a, r in zip(ordered_algos, ranks)}
 
 
-def compute_sk_ranks(algo_df, maximize=True, sk=None):
+def compute_sk_ranks(algo_df, maximize=True, sk=None, tie_tolerance=0.0):
     """
     algo_df: DataFrame, col=algo, row=runs best
     returns: dict algo->rank
@@ -119,6 +119,12 @@ def compute_sk_ranks(algo_df, maximize=True, sk=None):
     means = algo_df.mean(axis=0, skipna=True)
     if means.nunique(dropna=True) <= 1:
         return {a: 1 for a in algo_df.columns}
+
+    # 条件E：worst penalty 会加入很小扰动，均值只在扰动量级内波动时不应分组
+    if tie_tolerance > 0:
+        mean_spread = means.max(skipna=True) - means.min(skipna=True)
+        if pd.notna(mean_spread) and mean_spread <= tie_tolerance:
+            return {a: 1 for a in algo_df.columns}
 
     # -----------------------------
     # 2) 正常尝试 Scott-Knott
@@ -221,7 +227,13 @@ def collect_by_scale_group(
                 algo_data[algo] = vals
 
             algo_df = pd.DataFrame({a: pd.Series(v) for a, v in algo_data.items()})
-            ranks = compute_sk_ranks(algo_df, maximize=is_maximize(system), sk=sk_pkg)
+            tie_tolerance = 1e-2 if estimation == 'worst' else 0.0
+            ranks = compute_sk_ranks(
+                algo_df,
+                maximize=is_maximize(system),
+                sk=sk_pkg,
+                tie_tolerance=tie_tolerance
+            )
 
             rows = []
             for algo in algorithms:

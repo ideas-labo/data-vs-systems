@@ -248,7 +248,8 @@ def get_best_rank_group_algos(metrics: Dict[str, pd.Series], algos: List[str]) -
 def get_best_mean_algos_in_best_rank_group(
     system: str,
     metrics: Dict[str, pd.Series],
-    algos: List[str]
+    algos: List[str],
+    bold_tied_best_mean: bool = True
 ) -> List[str]:
     """
     Among the algorithms in the best-rank group, find those with the best mean value.
@@ -257,6 +258,9 @@ def get_best_mean_algos_in_best_rank_group(
     """
     best_group = get_best_rank_group_algos(metrics, algos)
     if not best_group:
+        return []
+
+    if not bold_tied_best_mean and len(best_group) == len(algos):
         return []
 
     pairs = []
@@ -413,8 +417,14 @@ def generate_latex_table(root_dir: Path, out_path: Path, highlight_color: str = 
         for system in systems:
             metrics = strategy_table[system]
             best_rank_by_system[system] = get_min_rank(metrics, algos)
+            bold_tied_best_mean = norm_name(strategy) != "worst"
             best_mean_winners_by_system[system] = set(
-                get_best_mean_algos_in_best_rank_group(system, metrics, algos)
+                get_best_mean_algos_in_best_rank_group(
+                    system,
+                    metrics,
+                    algos,
+                    bold_tied_best_mean=bold_tied_best_mean
+                )
             )
 
         for a_idx, algo in enumerate(algos):

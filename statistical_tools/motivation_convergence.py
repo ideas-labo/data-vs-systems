@@ -14,8 +14,8 @@ import pandas as pd
 # 1. User configuration
 # ============================================================
 
-SYSTEM = "clang"
-SYSTEM_SCALE = "clang_large"
+SYSTEM = "postgresql"
+SYSTEM_SCALE = "postgresql_large"
 
 FALLBACKS = [
     "1NN",
@@ -29,10 +29,10 @@ FALLBACKS = [
 ]
 
 ALGORITHMS = [
-    "smac",
+    # "smac",
     "bestconfig",
-    "flash",
-    "ga",
+    # "flash",
+    # "ga",
     "hebo",
     "promisetune",
     "random_search",
@@ -317,9 +317,7 @@ def tex_plot_block(
 
     return (
         mean_plot
-        + rf"""\addlegendentry{{{style['legend']}}}
-
-\addplot[
+        + rf"""\addplot[
 name path={upper_name},
 draw=none, forget plot
 ] coordinates {{

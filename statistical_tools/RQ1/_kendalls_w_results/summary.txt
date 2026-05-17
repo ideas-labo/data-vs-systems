@@ -1,8 +1,8 @@
 Root directory: RQ1/large
-Strategies used (8): 1NN, dal_rf, kNN, kNNw, loess, rf, rf_uncertainty, worst
-Systems analyzed (8): clang, gcc, httpd, mysql, postgresql, tomcat, x264, x265
+Strategies used (8): worst, 1NN, kNN, kNNw, loess, rf, dal_rf, rf_uncertainty
+Systems analyzed (8): mysql, postgresql, httpd, tomcat, gcc, clang, x264, x265
 
-Mean Kendall's W: 0.4726
-Std  Kendall's W: 0.0776
-Min  Kendall's W: 0.3474
+Mean Kendall's W: 0.4671
+Std  Kendall's W: 0.0891
+Min  Kendall's W: 0.2977
 Max  Kendall's W: 0.5701

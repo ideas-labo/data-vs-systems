@@ -1,8 +1,8 @@
 Scale,Workload,Algorithm,r,Mean (Std),IQR
-large,gcc_large,flash,4,80.11 (5.80),7.49
-large,gcc_large,ga,2,78.36 (5.72),8.47
-large,gcc_large,smac,3,78.56 (3.50),4.17
+large,gcc_large,flash,1,80.11 (5.80),7.49
+large,gcc_large,ga,1,78.36 (5.72),8.47
+large,gcc_large,smac,1,78.56 (3.50),4.17
 large,gcc_large,hebo,1,77.48 (2.99),0.67
-large,gcc_large,bestconfig,4,82.45 (7.43),9.57
-large,gcc_large,promisetune,5,84.75 (7.98),9.44
-large,gcc_large,random_search,3,79.56 (4.57),7.40
+large,gcc_large,bestconfig,1,82.45 (7.43),9.57
+large,gcc_large,promisetune,1,84.75 (7.98),9.44
+large,gcc_large,random_search,1,79.56 (4.57),7.40
