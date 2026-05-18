@@ -93,11 +93,12 @@ Purpose:
 
 Measure whether the fallback preserves the structure of the performance landscape.
 
-Current implemented metrics:
+Current implemented metrics: (we should carefully choose landscape metrics. Remove local optima and keep auto-correlation.)
 
 - `local_optima_ratio`
 - `local_optima_count`
 - `auto_correlation`
+
 
 Interpretation:
 

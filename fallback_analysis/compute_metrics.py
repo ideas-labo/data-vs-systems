@@ -152,14 +152,49 @@ def compute_one_prediction_file(csv_path: Path) -> None:
     )
 
 
+def infer_system_from_prediction_path(csv_path: Path) -> str:
+    stem = csv_path.name.removesuffix("_predictions.csv")
+    system, _scale = stem.rsplit("_", 1)
+    return system
+
+
+def find_prediction_csv_files(target_systems: set[str] | None) -> list[Path]:
+    csv_files = sorted(PREDICTION_INPUT_DIR.glob("*/*_predictions.csv"))
+    if target_systems is None:
+        return csv_files
+
+    return [
+        csv_path for csv_path in csv_files
+        if infer_system_from_prediction_path(csv_path) in target_systems
+    ]
+
+
 def main() -> None:
+    # Set to None to process every system under fallback_analysis/predictions.
+    target_systems = {
+        "mysql",
+        "postgresql",
+        "httpd",
+        "tomcat",
+    }
+    # target_systems = None
+
     if not PREDICTION_INPUT_DIR.exists():
         raise FileNotFoundError(f"Prediction directory not found: {PREDICTION_INPUT_DIR}")
 
-    csv_files = sorted(PREDICTION_INPUT_DIR.glob("*/*_predictions.csv"))
+    csv_files = find_prediction_csv_files(target_systems)
     if not csv_files:
-        print(f"[WARN] No prediction CSV files found under {PREDICTION_INPUT_DIR}")
+        print(f"[WARN] No matching prediction CSV files found under {PREDICTION_INPUT_DIR}")
         return
+
+    if target_systems is not None:
+        found_systems = {
+            infer_system_from_prediction_path(csv_path)
+            for csv_path in csv_files
+        }
+        missing_systems = sorted(target_systems - found_systems)
+        if missing_systems:
+            print(f"[WARN] No prediction CSV files found for systems: {missing_systems}")
 
     for csv_path in csv_files:
         print(f"[PROCESS] {csv_path}")
