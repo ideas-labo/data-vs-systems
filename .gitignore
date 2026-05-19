@@ -81,3 +81,4 @@ Thumbs.db
 # keep this ignored. Otherwise remove this line.
 # =========================
 # datasets/
+.venv/
