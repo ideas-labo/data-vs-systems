@@ -1,0 +1,9 @@
+fallback,0.05
+worst,542.8
+1NN,488.6
+kNN,67.5
+kNNw,75.7
+loess,45.8
+rf,67.4
+rf_uncertainty,202.4
+dal_rf,65.2

@@ -1,0 +1,11 @@
+system,scale,train_frac,repeat,fallback,local_optima_ratio_abs_error,local_optima_count_abs_error,auto_correlation_abs_error
+postgresql,large,0.05,2,rf_uncertainty,0.04487856388595565,425.0,0.15057345607520176
+postgresql,large,0.05,3,rf_uncertainty,0.05502746092099704,521.0,0.15121931130420174
+postgresql,large,0.05,9,rf_uncertainty,0.04043496621621621,383.0,0.16663114009560379
+postgresql,large,0.05,5,rf_uncertainty,0.041816261879619857,396.0,0.18816802935351054
+postgresql,large,0.05,6,rf_uncertainty,0.046040126715945096,436.0,0.1711844377827002
+postgresql,large,0.05,7,rf_uncertainty,0.0397295012679628,376.0,0.19574664645218726
+postgresql,large,0.05,1,rf_uncertainty,0.04763916763494243,451.0,0.19972554567168235
+postgresql,large,0.05,0,rf_uncertainty,0.05365441487114491,508.0,0.26392580932752535
+postgresql,large,0.05,4,rf_uncertainty,0.044993662864385296,426.0,0.25885642360727634
+postgresql,large,0.05,8,rf_uncertainty,0.04814697497624327,456.0,0.1462182976493164
