@@ -1,8 +1,0 @@
-Scale,Workload,Algorithm,r,Mean (Std),IQR
-small,tomcat_small,flash,5,3979.84 (195.07),109.58
-small,tomcat_small,ga,3,4342.13 (256.61),272.68
-small,tomcat_small,smac,2,4552.52 (228.04),224.99
-small,tomcat_small,hebo,1,5569.10 (203.37),236.99
-small,tomcat_small,bestconfig,6,3829.21 (149.76),125.18
-small,tomcat_small,promisetune,4,4280.99 (136.72),84.92
-small,tomcat_small,random_search,7,3765.06 (70.07),46.48

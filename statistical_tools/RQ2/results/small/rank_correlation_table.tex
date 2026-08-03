@@ -1,0 +1,14 @@
+\begin{tabular}{l|c|c|c|c|c|c|c|c|c}
+\hline
+\textbf{Fallback} & \textbf{\textsc{MySQL}} & \textbf{\textsc{PostgreSQL}} & \textbf{\textsc{Httpd}} & \textbf{\textsc{Tomcat}} & \textbf{\textsc{Gcc}} & \textbf{\textsc{Clang}} & \textbf{\textsc{X264}} & \textbf{\textsc{X265}} & \textbf{Mean} \\
+\hline
+Penalty & \textcolor{red}{\ding{55}} & \textcolor{red}{\ding{55}} & \textcolor{red}{\ding{55}} & \textcolor{red}{\ding{55}} & 0.013 & \textcolor{red}{\ding{55}} & \textcolor{red}{\ding{55}} & \textcolor{red}{\ding{55}} & 0.013 \\
+NN & 0.026 & -0.278 & \cellcolor{teal!15} 0.553 & 0.343 & \cellcolor{teal!15} 0.589 & -0.173 & -0.498 & \cellcolor{teal!15} 0.661 & 0.153 \\
+kNN & \cellcolor{teal!15} 0.443 & \cellcolor{blue!15} 0.764 & 0.185 & \cellcolor{teal!15} 0.581 & -0.356 & -0.027 & \cellcolor{teal!15} 0.462 & \cellcolor{blue!15} 0.950 & 0.375 \\
+wkNN & \cellcolor{teal!15} 0.443 & \cellcolor{blue!15} 0.700 & 0.114 & \cellcolor{teal!15} 0.581 & 0.173 & -0.115 & \cellcolor{teal!15} 0.547 & \cellcolor{blue!15} 0.851 & \cellcolor{teal!15} 0.412 \\
+LOESS & \cellcolor{teal!15} 0.538 & \cellcolor{blue!15} 0.718 & \cellcolor{teal!15} 0.471 & \cellcolor{teal!15} 0.601 & -0.440 & 0.322 & 0.153 & -0.299 & 0.258 \\
+RF & \cellcolor{teal!15} 0.619 & \cellcolor{teal!15} 0.605 & \cellcolor{blue!15} 0.801 & \cellcolor{blue!15} 0.885 & -0.556 & -0.232 & \cellcolor{blue!15} 0.725 & \cellcolor{blue!15} 0.941 & \cellcolor{teal!15} 0.473 \\
+DaL-RF & \cellcolor{teal!15} 0.586 & \cellcolor{teal!15} 0.608 & \cellcolor{blue!15} 0.768 & \cellcolor{blue!15} 0.825 & -0.316 & 0.000 & \cellcolor{blue!15} 0.692 & \cellcolor{blue!15} 0.854 & \cellcolor{teal!15} 0.502 \\
+U-RF & \cellcolor{teal!15} 0.647 & \cellcolor{teal!15} 0.618 & \cellcolor{blue!15} 0.785 & \cellcolor{teal!15} 0.616 & -0.434 & -0.018 & \cellcolor{teal!15} 0.613 & \cellcolor{blue!15} 0.924 & \cellcolor{teal!15} 0.469 \\
+\hline
+\end{tabular}

@@ -1,0 +1,10 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+medium,x265_medium,flash,1,21.58 (1.36),1.68
+medium,x265_medium,ga,1,20.61 (1.82),2.90
+medium,x265_medium,smac,1,22.98 (3.15),5.00
+medium,x265_medium,hebo,3,23.94 (2.98),5.49
+medium,x265_medium,bestconfig,6,25.28 (2.63),2.22
+medium,x265_medium,promisetune,4,25.07 (2.51),2.08
+medium,x265_medium,random_search,5,25.18 (2.76),2.38
+medium,x265_medium,ezr,2,23.00 (4.61),3.38
+medium,x265_medium,line,4,24.66 (3.15),3.88

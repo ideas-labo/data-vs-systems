@@ -1,0 +1,10 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+medium,gcc_medium,flash,3,44.11 (38.30),75.09
+medium,gcc_medium,ga,1,24.77 (31.77),49.04
+medium,gcc_medium,smac,2,31.42 (39.93),70.70
+medium,gcc_medium,hebo,1,22.24 (31.74),50.97
+medium,gcc_medium,bestconfig,5,69.32 (19.63),13.45
+medium,gcc_medium,promisetune,3,38.80 (35.96),72.77
+medium,gcc_medium,random_search,5,68.29 (15.35),18.80
+medium,gcc_medium,ezr,3,44.21 (31.64),59.75
+medium,gcc_medium,line,4,64.21 (18.80),24.80

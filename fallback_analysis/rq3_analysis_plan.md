@@ -290,13 +290,13 @@ A fallback is more reliable when:
 Current implemented pieces:
 
 - prediction storage:
-  - `fallback_analysis/predictions/{fallback}/{system}_{scale}_predictions.csv`
+  - `fallback_analysis/RQ3/results/predictions/{fallback}/{system}_{scale}_predictions.csv`
 - accuracy metrics:
-  - `fallback_analysis/accuracy_metrics.py`
+  - `fallback_analysis/RQ3/scripts/accuracy_metrics.py`
 - landscape metrics:
-  - `fallback_analysis/landscape_metrics.py`
+  - `fallback_analysis/RQ3/scripts/landscape_metrics.py`
 - metric computation:
-  - `fallback_analysis/compute_metrics.py`
+  - `fallback_analysis/RQ3/scripts/rq3_2_compute_accuracy_landscape_metrics.py`
 
 Recommended next additions:
 

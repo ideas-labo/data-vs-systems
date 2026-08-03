@@ -1,9 +1,0 @@
-strategy,pos_1,pos_2,pos_3,pos_4,pos_5,pos_6,pos_7
-worst,flash; ga; smac; hebo; bestconfig; promisetune; random_search,,,,,,
-1NN,flash,ga,promisetune,smac,bestconfig,random_search,hebo
-kNN,hebo,ga,promisetune,smac,flash,bestconfig,random_search
-kNNw,hebo,ga; smac,promisetune,flash,random_search,bestconfig,
-loess,smac,hebo,ga,promisetune,flash,random_search,bestconfig
-rf,hebo,promisetune,smac,flash,ga,random_search,bestconfig
-dal_rf,hebo,promisetune,flash,smac,ga,random_search,bestconfig
-rf_uncertainty,hebo,promisetune,flash,smac,ga,random_search,bestconfig

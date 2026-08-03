@@ -1,0 +1,10 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+medium,tomcat_medium,flash,1,1002.59 (0.00),0.00
+medium,tomcat_medium,ga,1,1002.59 (0.00),0.00
+medium,tomcat_medium,smac,1,1002.59 (0.00),0.00
+medium,tomcat_medium,hebo,1,1002.59 (0.00),0.00
+medium,tomcat_medium,bestconfig,1,1002.59 (0.00),0.00
+medium,tomcat_medium,promisetune,1,1002.59 (0.00),0.00
+medium,tomcat_medium,random_search,1,1002.59 (0.00),0.00
+medium,tomcat_medium,ezr,1,1002.59 (0.00),0.00
+medium,tomcat_medium,line,1,1002.59 (0.00),0.00

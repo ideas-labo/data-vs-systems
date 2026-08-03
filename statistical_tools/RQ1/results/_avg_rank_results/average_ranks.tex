@@ -1,0 +1,17 @@
+% Requires: \usepackage[table]{xcolor}
+% Requires: \usepackage{pifont}
+\begin{tabular}{lcccccccc}
+\toprule
+\textbf{Tuner} & \textbf{Penalty} & \textbf{NN} & \textbf{kNN} & \textbf{wkNN} & \textbf{LOESS} & \textbf{RF} & \textbf{DaL-RF} & \textbf{U-RF} \\
+\midrule
+\texttt{FLASH} & \textcolor{red}{\ding{55}} & \cellcolor{blue!15}1.38 & 3.62 & 3.62 & 3.75 & 2.62 & \cellcolor{red!15}2.75 & 2.38 \\
+\texttt{GA} & \textcolor{red}{\ding{55}} & \cellcolor{red!15}2.25 & \cellcolor{red!15}2.00 & 2.38 & 2.62 & 4.00 & 4.25 & 3.38 \\
+\texttt{SMAC} & \textcolor{red}{\ding{55}} & 3.00 & 2.88 & \cellcolor{red!15}2.25 & \cellcolor{blue!15}2.00 & 2.75 & 2.88 & 2.62 \\
+\texttt{HEBO} & \textcolor{red}{\ding{55}} & 4.00 & \cellcolor{blue!15}1.38 & \cellcolor{blue!15}1.50 & \cellcolor{red!15}2.25 & \cellcolor{blue!15}1.75 & \cellcolor{blue!15}2.00 & \cellcolor{blue!15}1.62 \\
+\texttt{BestConfig} & \textcolor{red}{\ding{55}} & 3.75 & 5.12 & 5.00 & 5.50 & 6.88 & 6.38 & 5.88 \\
+\texttt{PromiseTune} & \textcolor{red}{\ding{55}} & 2.62 & 2.62 & 2.62 & 3.00 & \cellcolor{red!15}2.25 & \cellcolor{blue!15}2.00 & \cellcolor{red!15}2.12 \\
+\texttt{RS} & \textcolor{red}{\ding{55}} & 3.62 & 5.50 & 4.88 & 5.25 & 5.75 & 5.62 & 5.50 \\
+\texttt{EZR} & \textcolor{red}{\ding{55}} & 2.62 & 5.12 & 5.38 & 6.00 & 5.75 & 5.00 & 5.12 \\
+\texttt{LINE} & \textcolor{red}{\ding{55}} & 2.75 & 5.62 & 5.38 & 5.00 & 5.50 & 5.75 & 4.75 \\
+\bottomrule
+\end{tabular}

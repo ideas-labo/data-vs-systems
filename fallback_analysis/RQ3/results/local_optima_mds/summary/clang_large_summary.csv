@@ -1,0 +1,2 @@
+system,scale,source_path,n_points,n_config_columns,maximize,performance_col,radius,avg_neighbor_count,isolated_ratio,eligible_local_optima_points,local_optima_count,local_optima_ratio,mds_method,stress,landmark_count,landmark_neighbors
+clang,large,/home/nuc004/DateEval/datasets/clang/clang_large.csv,20000,20,False,run_time,3.75,25.6681,0.0,20000,788,0.0394,landmark,222368406.70544365,5000,12

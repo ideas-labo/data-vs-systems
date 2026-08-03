@@ -1,8 +1,0 @@
-Scale,Workload,Algorithm,r,Mean (Std),IQR
-large,httpd_large,flash,4,2816.69 (85.18),117.35
-large,httpd_large,ga,3,3058.71 (322.98),304.00
-large,httpd_large,smac,2,3407.03 (407.41),364.13
-large,httpd_large,hebo,1,4184.27 (641.12),327.25
-large,httpd_large,bestconfig,5,2754.14 (86.48),131.08
-large,httpd_large,promisetune,3,3050.35 (368.98),219.77
-large,httpd_large,random_search,6,2686.21 (68.95),86.47

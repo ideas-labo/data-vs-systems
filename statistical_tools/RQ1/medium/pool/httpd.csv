@@ -1,5 +1,0 @@
-Scale,Workload,Algorithm,r,Mean (Std),IQR
-medium,httpd_medium,ezr_pool,2,2739.78 (66.92),110.24
-medium,httpd_medium,flash_pool,1,2803.90 (41.25),59.42
-medium,httpd_medium,line_pool,3,2705.44 (28.74),26.26
-medium,httpd_medium,random_search_pool,2,2747.81 (41.33),77.72

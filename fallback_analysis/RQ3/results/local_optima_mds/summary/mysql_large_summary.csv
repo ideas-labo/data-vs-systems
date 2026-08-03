@@ -1,0 +1,2 @@
+system,scale,source_path,n_points,n_config_columns,maximize,performance_col,radius,avg_neighbor_count,isolated_ratio,eligible_local_optima_points,local_optima_count,local_optima_ratio,mds_method,stress,landmark_count,landmark_neighbors
+mysql,large,/home/nuc004/DateEval/datasets/mysql/mysql_large.csv,9996,20,True,throughput,3.8671875,18.051620648259302,0.0019007603041216487,9977,584,0.05853462964819084,landmark,89948675.65413962,5000,12

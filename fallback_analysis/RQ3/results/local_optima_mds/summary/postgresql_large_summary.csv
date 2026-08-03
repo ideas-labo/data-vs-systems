@@ -1,0 +1,2 @@
+system,scale,source_path,n_points,n_config_columns,maximize,performance_col,radius,avg_neighbor_count,isolated_ratio,eligible_local_optima_points,local_optima_count,local_optima_ratio,mds_method,stress,landmark_count,landmark_neighbors
+postgresql,large,/home/nuc004/DateEval/datasets/postgresql/postgresql_large.csv,10000,20,True,throughput,3.828125,19.1184,0.0029,9971,748,0.07501755089760305,landmark,87476412.33318251,5000,12

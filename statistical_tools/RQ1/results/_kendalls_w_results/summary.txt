@@ -1,0 +1,8 @@
+Root directory: /Users/oliver/DataEval/statistical_tools/RQ1/results/large
+Strategies used (8): worst, 1NN, kNN, kNNw, loess, rf, dal_rf, rf_uncertainty
+Systems analyzed (8): mysql, postgresql, httpd, tomcat, gcc, clang, x264, x265
+
+Mean Kendall's W: 0.4937
+Std  Kendall's W: 0.1167
+Min  Kendall's W: 0.2968
+Max  Kendall's W: 0.5927

@@ -1,0 +1,10 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+small,mysql_small,flash,1,273.72 (1.61),2.32
+small,mysql_small,ga,5,265.05 (6.04),6.97
+small,mysql_small,smac,6,259.87 (15.78),6.56
+small,mysql_small,hebo,7,254.33 (14.36),20.90
+small,mysql_small,bestconfig,7,255.03 (15.17),25.69
+small,mysql_small,promisetune,2,271.13 (2.81),4.26
+small,mysql_small,random_search,3,269.94 (3.36),3.93
+small,mysql_small,ezr,5,264.83 (12.85),6.56
+small,mysql_small,line,4,268.58 (3.79),4.96

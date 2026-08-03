@@ -1,8 +1,0 @@
-Scale,Workload,Algorithm,r,Mean (Std),IQR
-medium,postgresql_medium,flash,5,376.87 (1.48),1.85
-medium,postgresql_medium,ga,3,380.61 (1.52),1.68
-medium,postgresql_medium,smac,2,381.34 (2.67),1.32
-medium,postgresql_medium,hebo,1,383.60 (1.36),2.38
-medium,postgresql_medium,bestconfig,6,374.96 (2.79),2.49
-medium,postgresql_medium,promisetune,4,379.72 (1.32),1.54
-medium,postgresql_medium,random_search,7,374.08 (1.18),1.18

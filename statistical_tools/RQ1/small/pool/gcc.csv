@@ -1,5 +1,0 @@
-Scale,Workload,Algorithm,r,Mean (Std),IQR
-small,gcc_small,ezr_pool,2,66.12 (2.21),3.05
-small,gcc_small,flash_pool,1,65.22 (1.93),3.62
-small,gcc_small,line_pool,2,66.36 (2.05),3.29
-small,gcc_small,random_search_pool,3,67.36 (1.56),1.36

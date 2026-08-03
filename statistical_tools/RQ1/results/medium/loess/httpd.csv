@@ -1,0 +1,10 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+medium,httpd_medium,flash,4,2883.89 (83.32),140.59
+medium,httpd_medium,ga,3,3024.62 (229.30),234.78
+medium,httpd_medium,smac,2,3297.30 (229.92),370.03
+medium,httpd_medium,hebo,1,3921.40 (388.73),563.25
+medium,httpd_medium,bestconfig,8,2677.43 (65.84),98.32
+medium,httpd_medium,promisetune,3,3045.00 (234.08),275.33
+medium,httpd_medium,random_search,5,2756.16 (74.52),56.12
+medium,httpd_medium,ezr,7,2701.00 (79.82),26.76
+medium,httpd_medium,line,6,2741.92 (52.59),78.03

@@ -12,7 +12,7 @@
 2. RQ2: 在真实系统上运行 tuner，不需要 fallback，得到 ground-truth tuner ranking。然后比较不同 fallback 下得到的 tuner ranking 与 ground truth 的相关性。
 3. RQ3: 解释为什么某些 fallback 更接近 ground truth，以及如何设计更可靠的 fallback guideline。
 
-当前 `fallback_analysis/analysis.py` 已经做 sparse-to-full reconstruction：
+当前 `fallback_analysis/RQ3/scripts/rq3_1_generate_predictions.py` 已经做 sparse-to-full reconstruction：
 
 - 从完整 table 中抽取一部分作为 train/observed table。
 - 使用 train table + fallback 预测 holdout configurations。
@@ -36,10 +36,10 @@
 
 允许新增或修改：
 
-- `fallback_analysis/analysis.py`
-- `fallback_analysis/metric_visualization.py`
-- `fallback_analysis/landscape_metrics.py`
-- `fallback_analysis/accuracy_metrics.py` 我感觉可以把analysis里面计算mre 等指标的都放到这里面来，便于代码管理
+- `fallback_analysis/RQ3/scripts/rq3_1_generate_predictions.py`
+- `fallback_analysis/RQ3/scripts/rq3_7_visualize_metric_summary.py`
+- `fallback_analysis/RQ3/scripts/landscape_metrics.py`
+- `fallback_analysis/RQ3/scripts/accuracy_metrics.py` 我感觉可以把analysis里面计算mre 等指标的都放到这里面来，便于代码管理
 - 如确有必要，可新增一个简单 visualization 脚本。
 
 不要修改：
@@ -50,9 +50,9 @@
 - tuner 实现
 - utils 实现，除非绝对必要
 
-## 1. Add `fallback_analysis/landscape_metrics.py`
+## 1. Add `fallback_analysis/RQ3/scripts/landscape_metrics.py`
 
-新建 `fallback_analysis/landscape_metrics.py`。
+新建 `fallback_analysis/RQ3/scripts/landscape_metrics.py`。
 
 该文件只负责 landscape 指标计算：
 
@@ -363,8 +363,8 @@ Landscape:
 输出目录建议：
 
 ```text
-fallback_analysis/visualization/accuracy/
-fallback_analysis/visualization/landscape/
+fallback_analysis/RQ3/results/visualization/accuracy/
+fallback_analysis/RQ3/results/visualization/landscape/
 ```
 
 图的要求：
@@ -380,7 +380,7 @@ fallback_analysis/visualization/landscape/
 - 不要引入复杂 class。
 - 函数保持短小清晰。
 - 不重构整个项目。
-- 优先复用现有 `analysis.py` 的 helper，例如 `infer_optimization_goal()` 和 `objective_to_score()`。
+- 优先复用现有 `rq3_1_generate_predictions.py` 的 helper，例如 `infer_optimization_goal()` 和 `objective_to_score()`。
 - 对 NaN、constant vector、样本太少、无邻居等情况返回 NaN 或合理默认值，不要中断整个实验。
 - 添加必要但简短的注释。
 - 不要修改原始数据。

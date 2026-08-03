@@ -1,0 +1,2 @@
+system,scale,source_path,n_points,n_config_columns,maximize,performance_col,radius,avg_neighbor_count,isolated_ratio,eligible_local_optima_points,local_optima_count,local_optima_ratio,mds_method,stress,landmark_count,landmark_neighbors
+x264,large,/home/nuc004/DateEval/datasets/x264/x264_large.csv,20000,20,False,run_time,4.96875,20.0874,0.0,20000,705,0.03525,landmark,204892366.29382512,5000,12

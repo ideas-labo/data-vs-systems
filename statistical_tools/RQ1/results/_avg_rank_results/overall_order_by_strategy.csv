@@ -1,0 +1,9 @@
+strategy,pos_1,pos_2,pos_3,pos_4,pos_5,pos_6,pos_7,pos_8,pos_9
+worst,flash; ga; smac; hebo; bestconfig; promisetune; random_search; ezr; line,,,,,,,,
+1NN,flash,ga,promisetune; ezr,line,smac,random_search,bestconfig,hebo,
+kNN,hebo,ga,promisetune,smac,flash,bestconfig; ezr,random_search,line,
+kNNw,hebo,smac,ga,promisetune,flash,random_search,bestconfig,ezr; line,
+loess,smac,hebo,ga,promisetune,flash,line,random_search,bestconfig,ezr
+rf,hebo,promisetune,flash,smac,ga,line,random_search; ezr,bestconfig,
+dal_rf,hebo; promisetune,flash,smac,ga,ezr,random_search,line,bestconfig,
+rf_uncertainty,hebo,promisetune,flash,smac,ga,line,ezr,random_search,bestconfig

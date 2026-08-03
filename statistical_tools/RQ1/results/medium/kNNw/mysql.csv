@@ -1,0 +1,10 @@
+Scale,Workload,Algorithm,r,Mean (Std),IQR
+medium,mysql_medium,flash,4,211.38 (0.41),0.44
+medium,mysql_medium,ga,3,211.60 (0.68),0.90
+medium,mysql_medium,smac,2,212.48 (0.97),1.05
+medium,mysql_medium,hebo,1,214.40 (0.60),0.43
+medium,mysql_medium,bestconfig,7,207.31 (0.69),0.98
+medium,mysql_medium,promisetune,2,212.38 (0.45),0.75
+medium,mysql_medium,random_search,5,209.74 (0.86),0.78
+medium,mysql_medium,ezr,6,209.26 (0.83),1.48
+medium,mysql_medium,line,5,209.60 (0.72),1.22

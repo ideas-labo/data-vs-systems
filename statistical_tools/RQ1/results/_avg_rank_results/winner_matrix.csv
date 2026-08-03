@@ -1,0 +1,9 @@
+system,worst,1NN,kNN,kNNw,loess,rf,dal_rf,rf_uncertainty
+mysql,flash; ga; smac; hebo; bestconfig; promisetune; random_search; ezr; line,flash,hebo,hebo,hebo,hebo,hebo,hebo
+postgresql,flash; ga; smac; hebo; bestconfig; promisetune; random_search; ezr; line,flash; line,hebo,hebo,hebo,hebo; promisetune,hebo,hebo
+httpd,flash; ga; smac; hebo; bestconfig; promisetune; random_search; ezr; line,smac,hebo,hebo,hebo,promisetune,promisetune; random_search,smac; promisetune
+tomcat,flash; ga; smac; hebo; bestconfig; promisetune; random_search; ezr; line,flash; line,hebo,hebo,hebo,flash,flash,promisetune
+gcc,flash; ga; smac; hebo; bestconfig; promisetune; random_search; ezr; line,random_search; line,ga; smac,smac; promisetune,smac,smac,promisetune,smac; hebo
+clang,flash; ga; smac; hebo; bestconfig; promisetune; random_search; ezr; line,flash,hebo; ezr,smac; random_search,smac,smac,promisetune,ga
+x264,flash; ga; smac; hebo; bestconfig; promisetune; random_search; ezr; line,ga; ezr,hebo,hebo,smac,hebo,flash,hebo
+x265,flash; ga; smac; hebo; bestconfig; promisetune; random_search; ezr; line,flash; ezr,hebo,hebo,flash,hebo,hebo,flash; hebo

@@ -1,0 +1,2 @@
+system,scale,source_path,n_points,n_config_columns,maximize,performance_col,radius,avg_neighbor_count,isolated_ratio,eligible_local_optima_points,local_optima_count,local_optima_ratio,mds_method,stress,landmark_count,landmark_neighbors
+httpd,large,/home/nuc004/DateEval/datasets/httpd/httpd_large.csv,18035,20,True,RPS,4.76171875,21.69370668145273,0.00011089548100914888,18033,476,0.026396051683025563,landmark,145421074.88161138,5000,12

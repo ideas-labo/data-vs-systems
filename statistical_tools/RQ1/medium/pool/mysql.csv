@@ -1,5 +1,0 @@
-Scale,Workload,Algorithm,r,Mean (Std),IQR
-medium,mysql_medium,ezr_pool,2,273.66 (3.78),2.32
-medium,mysql_medium,flash_pool,1,281.15 (0.00),0.00
-medium,mysql_medium,line_pool,3,270.92 (4.16),1.46
-medium,mysql_medium,random_search_pool,3,271.47 (5.27),7.16

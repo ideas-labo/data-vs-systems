@@ -1,5 +1,0 @@
-Scale,Workload,Algorithm,r,Mean (Std),IQR
-large,clang_large,ezr_pool,1,66.69 (2.28),2.53
-large,clang_large,flash_pool,2,67.13 (1.58),2.71
-large,clang_large,line_pool,1,66.91 (2.29),4.57
-large,clang_large,random_search_pool,2,67.43 (2.06),3.09

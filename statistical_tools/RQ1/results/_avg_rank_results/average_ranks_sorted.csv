@@ -1,0 +1,10 @@
+worst_algorithm,worst_avg_rank,1NN_algorithm,1NN_avg_rank,kNN_algorithm,kNN_avg_rank,kNNw_algorithm,kNNw_avg_rank,loess_algorithm,loess_avg_rank,rf_algorithm,rf_avg_rank,dal_rf_algorithm,dal_rf_avg_rank,rf_uncertainty_algorithm,rf_uncertainty_avg_rank
+flash,1.00,flash,1.38,hebo,1.38,hebo,1.50,smac,2.00,hebo,1.75,hebo,2.00,hebo,1.62
+ga,1.00,ga,2.25,ga,2.00,smac,2.25,hebo,2.25,promisetune,2.25,promisetune,2.00,promisetune,2.12
+smac,1.00,promisetune,2.62,promisetune,2.62,ga,2.38,ga,2.62,flash,2.62,flash,2.75,flash,2.38
+hebo,1.00,ezr,2.62,smac,2.88,promisetune,2.62,promisetune,3.00,smac,2.75,smac,2.88,smac,2.62
+bestconfig,1.00,line,2.75,flash,3.62,flash,3.62,flash,3.75,ga,4.00,ga,4.25,ga,3.38
+promisetune,1.00,smac,3.00,bestconfig,5.12,random_search,4.88,line,5.00,line,5.50,ezr,5.00,line,4.75
+random_search,1.00,random_search,3.62,ezr,5.12,bestconfig,5.00,random_search,5.25,random_search,5.75,random_search,5.62,ezr,5.12
+ezr,1.00,bestconfig,3.75,random_search,5.50,ezr,5.38,bestconfig,5.50,ezr,5.75,line,5.75,random_search,5.50
+line,1.00,hebo,4.00,line,5.62,line,5.38,ezr,6.00,bestconfig,6.88,bestconfig,6.38,bestconfig,5.88

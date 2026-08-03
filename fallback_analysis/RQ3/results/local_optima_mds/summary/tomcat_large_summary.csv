@@ -1,0 +1,2 @@
+system,scale,source_path,n_points,n_config_columns,maximize,performance_col,radius,avg_neighbor_count,isolated_ratio,eligible_local_optima_points,local_optima_count,local_optima_ratio,mds_method,stress,landmark_count,landmark_neighbors
+tomcat,large,/home/nuc004/DateEval/datasets/tomcat/tomcat_large.csv,19352,20,True,RPS,3.4375,18.001550227366682,0.0023253410500206698,19307,1469,0.0760863935360232,landmark,83180975.52919285,5000,12

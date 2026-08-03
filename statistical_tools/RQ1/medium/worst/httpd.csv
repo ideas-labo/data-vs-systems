@@ -1,8 +1,0 @@
-Scale,Workload,Algorithm,r,Mean (Std),IQR
-medium,httpd_medium,flash,1,300.02 (0.00),0.00
-medium,httpd_medium,ga,1,300.02 (0.00),0.00
-medium,httpd_medium,smac,1,300.02 (0.00),0.00
-medium,httpd_medium,hebo,1,300.02 (0.00),0.00
-medium,httpd_medium,bestconfig,1,300.02 (0.00),0.00
-medium,httpd_medium,promisetune,1,300.02 (0.00),0.00
-medium,httpd_medium,random_search,1,300.02 (0.00),0.00

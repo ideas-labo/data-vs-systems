@@ -42,7 +42,7 @@ def run_one_experiment(fallback, run_id, budgets, systems, compared_algorithms):
             for algo_name in compared_algorithms:
                 header = config_manager.get_config_header()
                 logger = Logger(
-                    base_dir=f"results/run{run_id}/{fallback}",
+                    base_dir=f"results_dataset/run{run_id}/{fallback}",
                     algorithm=f"{algo_name}",
                     system=f"{system}",
                     scale=f"{scale_name}",

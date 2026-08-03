@@ -1,5 +1,0 @@
-Scale,Workload,Algorithm,r,Mean (Std),IQR
-small,postgresql_small,ezr_pool,3,473.80 (0.00),0.00
-small,postgresql_small,flash_pool,2,479.65 (6.77),13.29
-small,postgresql_small,line_pool,1,482.68 (6.93),9.40
-small,postgresql_small,random_search_pool,3,474.62 (7.31),10.68

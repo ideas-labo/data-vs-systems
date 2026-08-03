@@ -1,0 +1,1466 @@
+% Requires: \usepackage{multirow}
+% Requires: \usepackage[table]{xcolor}
+% Requires: \usepackage{pifont}
+% Highlight color used for best-rank-group cells: blue!15
+\begin{tabular}{clllllllllllllllll}
+\hline
+\multicolumn{1}{c|}{\multirow{2}{*}{\textbf{Estimation}}} &
+  \multicolumn{1}{c|}{\multirow{2}{*}{\textbf{Tuner}}} &
+  \multicolumn{2}{c|}{\textbf{\textsc{MySQL}}} &
+  \multicolumn{2}{c|}{\textbf{\textsc{PostgreSQL}}} &
+  \multicolumn{2}{c|}{\textbf{\textsc{Httpd}}} &
+  \multicolumn{2}{c|}{\textbf{\textsc{Tomcat}}} &
+  \multicolumn{2}{c|}{\textbf{\textsc{Gcc}}} &
+  \multicolumn{2}{c|}{\textbf{\textsc{Clang}}} &
+  \multicolumn{2}{c|}{\textbf{\textsc{X264}}} &
+  \multicolumn{2}{c}{\textbf{\textsc{X265}}} \\
+\cline{3-18}
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{c|}{} &
+  \textbf{$r$} &
+  \multicolumn{1}{l|}{\textbf{mean}} &
+  \textbf{$r$} &
+  \multicolumn{1}{l|}{\textbf{mean}} &
+  \textbf{$r$} &
+  \multicolumn{1}{l|}{\textbf{mean}} &
+  \textbf{$r$} &
+  \multicolumn{1}{l|}{\textbf{mean}} &
+  \textbf{$r$} &
+  \multicolumn{1}{l|}{\textbf{mean}} &
+  \textbf{$r$} &
+  \multicolumn{1}{l|}{\textbf{mean}} &
+  \textbf{$r$} &
+  \multicolumn{1}{l|}{\textbf{mean}} &
+  \textbf{$r$} &
+  \textbf{mean} \\ \hline
+\multicolumn{1}{c|}{\multirow{9}{*}{\textbf{Penalty}}} &
+  \multicolumn{1}{l|}{\texttt{FLASH}} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{54.88 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{15.67 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{300.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{971.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{80.11 (5.80)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{78.84 (5.02)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{333.37 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  5501.66 (0.00) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{GA}} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{54.88 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{15.67 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{300.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{971.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{78.36 (5.72)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{81.17 (3.63)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{333.37 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  5501.66 (0.00) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{SMAC}} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{54.88 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{15.67 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{300.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{971.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{78.56 (3.50)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{80.69 (4.91)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{333.37 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  5501.66 (0.00) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{HEBO}} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{54.88 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{15.67 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{300.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{971.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{77.48 (2.99)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{79.72 (6.24)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{333.37 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  5501.66 (0.00) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{BestConfig}} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{54.88 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{15.67 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{300.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{971.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{82.45 (7.43)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{79.19 (6.86)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{333.37 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  5501.66 (0.00) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{PromiseTune}} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{54.88 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{15.67 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{300.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{971.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{84.75 (7.98)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{84.39 (5.71)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{333.37 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  5501.66 (0.00) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{RS}} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{54.88 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{15.67 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{300.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{971.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{79.56 (4.57)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{78.20 (4.08)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{333.37 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  5501.66 (0.00) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LITE}} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{54.88 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{15.67 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{300.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{971.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{80.82 (4.33)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{80.98 (1.68)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{333.37 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  5501.66 (0.00) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LINE}} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{54.88 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{15.67 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{300.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{971.02 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{78.96 (3.87)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{78.33 (4.04)} &
+  \textcolor{red}{\ding{55}} &
+  \multicolumn{1}{l|}{333.37 (0.00)} &
+  \textcolor{red}{\ding{55}} &
+  5501.66 (0.00) \\
+\hline
+\multicolumn{1}{l}{\textbf{}} &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    \\ \hline
+\multicolumn{1}{c|}{\multirow{9}{*}{\textbf{NN}}} &
+  \multicolumn{1}{l|}{\texttt{FLASH}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{275.29 (2.29)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{475.79 (15.92)}} &
+  2 &
+  \multicolumn{1}{l|}{2841.41 (254.54)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{2912.78 (86.70)}} &
+  2 &
+  \multicolumn{1}{l|}{67.28 (2.40)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{66.20 (2.20)}} &
+  2 &
+  \multicolumn{1}{l|}{9.27 (0.22)} &
+  \cellcolor{blue!15}1 &
+  \cellcolor{blue!15}21.35 (2.72) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{GA}} &
+  3 &
+  \multicolumn{1}{l|}{273.11 (5.15)} &
+  2 &
+  \multicolumn{1}{l|}{469.68 (6.13)} &
+  2 &
+  \multicolumn{1}{l|}{2823.00 (263.22)} &
+  3 &
+  \multicolumn{1}{l|}{2881.49 (66.99)} &
+  3 &
+  \multicolumn{1}{l|}{68.53 (2.71)} &
+  2 &
+  \multicolumn{1}{l|}{66.73 (2.06)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}9.14 (0.14)} &
+  2 &
+  22.00 (2.32) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{SMAC}} &
+  4 &
+  \multicolumn{1}{l|}{268.90 (5.08)} &
+  4 &
+  \multicolumn{1}{l|}{460.65 (13.37)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{2957.97 (353.96)}} &
+  4 &
+  \multicolumn{1}{l|}{2839.43 (75.79)} &
+  2 &
+  \multicolumn{1}{l|}{68.49 (2.45)} &
+  3 &
+  \multicolumn{1}{l|}{67.39 (2.06)} &
+  3 &
+  \multicolumn{1}{l|}{9.37 (0.42)} &
+  3 &
+  22.88 (1.88) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{HEBO}} &
+  7 &
+  \multicolumn{1}{l|}{260.43 (15.08)} &
+  5 &
+  \multicolumn{1}{l|}{449.75 (9.80)} &
+  3 &
+  \multicolumn{1}{l|}{2792.55 (42.57)} &
+  6 &
+  \multicolumn{1}{l|}{2777.90 (28.72)} &
+  2 &
+  \multicolumn{1}{l|}{68.18 (1.60)} &
+  2 &
+  \multicolumn{1}{l|}{66.66 (1.48)} &
+  3 &
+  \multicolumn{1}{l|}{9.32 (0.43)} &
+  4 &
+  23.32 (2.09) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{BestConfig}} &
+  6 &
+  \multicolumn{1}{l|}{263.40 (10.64)} &
+  2 &
+  \multicolumn{1}{l|}{470.36 (10.92)} &
+  4 &
+  \multicolumn{1}{l|}{2742.37 (49.90)} &
+  5 &
+  \multicolumn{1}{l|}{2830.00 (55.71)} &
+  3 &
+  \multicolumn{1}{l|}{68.76 (1.77)} &
+  4 &
+  \multicolumn{1}{l|}{67.53 (1.55)} &
+  4 &
+  \multicolumn{1}{l|}{9.46 (0.39)} &
+  2 &
+  22.57 (2.20) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{PromiseTune}} &
+  2 &
+  \multicolumn{1}{l|}{274.53 (2.97)} &
+  2 &
+  \multicolumn{1}{l|}{471.02 (12.09)} &
+  2 &
+  \multicolumn{1}{l|}{2840.16 (255.44)} &
+  2 &
+  \multicolumn{1}{l|}{2897.63 (50.13)} &
+  3 &
+  \multicolumn{1}{l|}{68.69 (3.19)} &
+  3 &
+  \multicolumn{1}{l|}{67.44 (2.74)} &
+  4 &
+  \multicolumn{1}{l|}{9.54 (0.36)} &
+  3 &
+  23.29 (3.07) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{RS}} &
+  6 &
+  \multicolumn{1}{l|}{264.93 (11.75)} &
+  3 &
+  \multicolumn{1}{l|}{467.42 (13.49)} &
+  5 &
+  \multicolumn{1}{l|}{2723.83 (55.07)} &
+  4 &
+  \multicolumn{1}{l|}{2842.02 (40.02)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}67.19 (1.71)} &
+  3 &
+  \multicolumn{1}{l|}{66.75 (1.66)} &
+  2 &
+  \multicolumn{1}{l|}{9.31 (0.28)} &
+  5 &
+  24.11 (3.46) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LITE}} &
+  5 &
+  \multicolumn{1}{l|}{267.50 (6.83)} &
+  2 &
+  \multicolumn{1}{l|}{469.71 (15.27)} &
+  2 &
+  \multicolumn{1}{l|}{2826.47 (259.14)} &
+  4 &
+  \multicolumn{1}{l|}{2844.49 (49.19)} &
+  2 &
+  \multicolumn{1}{l|}{68.42 (2.34)} &
+  4 &
+  \multicolumn{1}{l|}{68.49 (2.34)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{9.13 (0.22)}} &
+  \cellcolor{blue!15}1 &
+  \cellcolor{blue!15}\textbf{20.74 (1.40)} \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LINE}} &
+  3 &
+  \multicolumn{1}{l|}{272.91 (4.58)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}472.92 (15.67)} &
+  5 &
+  \multicolumn{1}{l|}{2727.42 (53.54)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}2906.05 (47.15)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{67.00 (1.65)}} &
+  2 &
+  \multicolumn{1}{l|}{66.33 (1.85)} &
+  3 &
+  \multicolumn{1}{l|}{9.38 (0.48)} &
+  6 &
+  24.47 (2.60) \\
+\hline
+\multicolumn{1}{l}{\textbf{}} &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    \\ \hline
+\multicolumn{1}{c|}{\multirow{9}{*}{\textbf{kNN}}} &
+  \multicolumn{1}{l|}{\texttt{FLASH}} &
+  4 &
+  \multicolumn{1}{l|}{213.06 (0.63)} &
+  5 &
+  \multicolumn{1}{l|}{381.49 (2.07)} &
+  3 &
+  \multicolumn{1}{l|}{2396.75 (13.62)} &
+  4 &
+  \multicolumn{1}{l|}{2670.21 (2.36)} &
+  3 &
+  \multicolumn{1}{l|}{79.09 (4.11)} &
+  3 &
+  \multicolumn{1}{l|}{78.46 (3.27)} &
+  3 &
+  \multicolumn{1}{l|}{16.57 (0.75)} &
+  4 &
+  54.91 (1.63) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{GA}} &
+  2 &
+  \multicolumn{1}{l|}{214.34 (0.97)} &
+  2 &
+  \multicolumn{1}{l|}{385.23 (1.40)} &
+  2 &
+  \multicolumn{1}{l|}{2406.99 (12.64)} &
+  2 &
+  \multicolumn{1}{l|}{2672.47 (3.69)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{75.37 (6.04)}} &
+  2 &
+  \multicolumn{1}{l|}{78.30 (3.69)} &
+  2 &
+  \multicolumn{1}{l|}{16.23 (0.65)} &
+  3 &
+  54.35 (1.82) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{SMAC}} &
+  2 &
+  \multicolumn{1}{l|}{214.39 (0.46)} &
+  3 &
+  \multicolumn{1}{l|}{384.40 (1.55)} &
+  2 &
+  \multicolumn{1}{l|}{2407.55 (14.08)} &
+  3 &
+  \multicolumn{1}{l|}{2671.74 (3.69)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}75.47 (4.89)} &
+  3 &
+  \multicolumn{1}{l|}{78.86 (5.71)} &
+  4 &
+  \multicolumn{1}{l|}{16.71 (0.63)} &
+  5 &
+  55.51 (2.07) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{HEBO}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{216.22 (0.77)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{389.77 (2.86)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{2462.07 (24.50)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{2680.48 (3.58)}} &
+  4 &
+  \multicolumn{1}{l|}{79.94 (4.73)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}76.89 (4.83)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{15.90 (0.32)}} &
+  \cellcolor{blue!15}1 &
+  \cellcolor{blue!15}\textbf{45.93 (0.83)} \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{BestConfig}} &
+  7 &
+  \multicolumn{1}{l|}{210.41 (0.38)} &
+  6 &
+  \multicolumn{1}{l|}{378.71 (1.64)} &
+  4 &
+  \multicolumn{1}{l|}{2365.62 (10.39)} &
+  7 &
+  \multicolumn{1}{l|}{2661.11 (3.93)} &
+  2 &
+  \multicolumn{1}{l|}{79.08 (3.14)} &
+  2 &
+  \multicolumn{1}{l|}{77.21 (4.92)} &
+  6 &
+  \multicolumn{1}{l|}{18.97 (1.28)} &
+  7 &
+  65.12 (3.95) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{PromiseTune}} &
+  3 &
+  \multicolumn{1}{l|}{213.96 (0.52)} &
+  4 &
+  \multicolumn{1}{l|}{383.63 (1.16)} &
+  2 &
+  \multicolumn{1}{l|}{2405.09 (11.55)} &
+  2 &
+  \multicolumn{1}{l|}{2672.85 (1.69)} &
+  2 &
+  \multicolumn{1}{l|}{76.34 (7.43)} &
+  4 &
+  \multicolumn{1}{l|}{82.43 (4.66)} &
+  2 &
+  \multicolumn{1}{l|}{16.43 (0.52)} &
+  2 &
+  54.18 (2.95) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{RS}} &
+  5 &
+  \multicolumn{1}{l|}{211.27 (0.82)} &
+  7 &
+  \multicolumn{1}{l|}{376.00 (0.92)} &
+  5 &
+  \multicolumn{1}{l|}{2351.16 (22.73)} &
+  6 &
+  \multicolumn{1}{l|}{2663.54 (2.86)} &
+  3 &
+  \multicolumn{1}{l|}{79.56 (5.56)} &
+  3 &
+  \multicolumn{1}{l|}{81.99 (3.56)} &
+  8 &
+  \multicolumn{1}{l|}{19.46 (1.32)} &
+  7 &
+  66.24 (3.08) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LITE}} &
+  5 &
+  \multicolumn{1}{l|}{211.13 (1.16)} &
+  8 &
+  \multicolumn{1}{l|}{375.55 (1.46)} &
+  5 &
+  \multicolumn{1}{l|}{2352.63 (26.36)} &
+  7 &
+  \multicolumn{1}{l|}{2662.11 (6.64)} &
+  4 &
+  \multicolumn{1}{l|}{80.66 (3.92)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{75.69 (4.50)}} &
+  5 &
+  \multicolumn{1}{l|}{17.39 (0.82)} &
+  6 &
+  62.92 (8.21) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LINE}} &
+  6 &
+  \multicolumn{1}{l|}{210.96 (0.41)} &
+  8 &
+  \multicolumn{1}{l|}{375.77 (1.72)} &
+  5 &
+  \multicolumn{1}{l|}{2356.01 (24.90)} &
+  5 &
+  \multicolumn{1}{l|}{2664.75 (3.53)} &
+  4 &
+  \multicolumn{1}{l|}{81.30 (4.99)} &
+  2 &
+  \multicolumn{1}{l|}{77.00 (5.20)} &
+  7 &
+  \multicolumn{1}{l|}{19.06 (1.03)} &
+  8 &
+  68.06 (3.06) \\
+\hline
+\multicolumn{1}{l}{\textbf{}} &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    \\ \hline
+\multicolumn{1}{c|}{\multirow{9}{*}{\textbf{wkNN}}} &
+  \multicolumn{1}{l|}{\texttt{FLASH}} &
+  4 &
+  \multicolumn{1}{l|}{212.89 (0.32)} &
+  5 &
+  \multicolumn{1}{l|}{381.20 (2.17)} &
+  4 &
+  \multicolumn{1}{l|}{2404.98 (20.27)} &
+  3 &
+  \multicolumn{1}{l|}{2672.15 (1.88)} &
+  3 &
+  \multicolumn{1}{l|}{79.80 (5.23)} &
+  3 &
+  \multicolumn{1}{l|}{80.98 (3.35)} &
+  4 &
+  \multicolumn{1}{l|}{16.56 (0.59)} &
+  3 &
+  55.39 (1.44) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{GA}} &
+  3 &
+  \multicolumn{1}{l|}{214.13 (0.50)} &
+  2 &
+  \multicolumn{1}{l|}{385.51 (1.04)} &
+  3 &
+  \multicolumn{1}{l|}{2419.02 (16.90)} &
+  3 &
+  \multicolumn{1}{l|}{2672.46 (3.46)} &
+  2 &
+  \multicolumn{1}{l|}{77.75 (5.61)} &
+  2 &
+  \multicolumn{1}{l|}{78.46 (4.20)} &
+  2 &
+  \multicolumn{1}{l|}{16.24 (0.51)} &
+  2 &
+  52.76 (2.30) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{SMAC}} &
+  2 &
+  \multicolumn{1}{l|}{214.55 (0.86)} &
+  3 &
+  \multicolumn{1}{l|}{384.92 (2.22)} &
+  2 &
+  \multicolumn{1}{l|}{2423.73 (25.79)} &
+  2 &
+  \multicolumn{1}{l|}{2672.91 (2.32)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{74.79 (4.87)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}76.94 (4.06)} &
+  5 &
+  \multicolumn{1}{l|}{16.97 (0.63)} &
+  2 &
+  54.57 (2.33) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{HEBO}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{216.80 (0.87)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{390.60 (3.57)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{2437.80 (17.91)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{2681.76 (2.51)}} &
+  4 &
+  \multicolumn{1}{l|}{79.97 (4.28)} &
+  2 &
+  \multicolumn{1}{l|}{77.04 (5.59)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{15.55 (0.74)}} &
+  \cellcolor{blue!15}1 &
+  \cellcolor{blue!15}\textbf{45.83 (0.83)} \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{BestConfig}} &
+  7 &
+  \multicolumn{1}{l|}{210.34 (0.87)} &
+  6 &
+  \multicolumn{1}{l|}{378.28 (1.63)} &
+  6 &
+  \multicolumn{1}{l|}{2358.85 (15.43)} &
+  5 &
+  \multicolumn{1}{l|}{2661.06 (2.28)} &
+  2 &
+  \multicolumn{1}{l|}{78.72 (4.87)} &
+  3 &
+  \multicolumn{1}{l|}{79.24 (4.53)} &
+  6 &
+  \multicolumn{1}{l|}{18.23 (0.87)} &
+  5 &
+  66.19 (4.92) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{PromiseTune}} &
+  3 &
+  \multicolumn{1}{l|}{214.09 (0.48)} &
+  4 &
+  \multicolumn{1}{l|}{384.21 (1.68)} &
+  4 &
+  \multicolumn{1}{l|}{2406.66 (16.41)} &
+  2 &
+  \multicolumn{1}{l|}{2673.21 (2.23)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}76.24 (2.71)} &
+  2 &
+  \multicolumn{1}{l|}{78.76 (4.72)} &
+  3 &
+  \multicolumn{1}{l|}{16.46 (0.75)} &
+  2 &
+  55.19 (1.05) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{RS}} &
+  6 &
+  \multicolumn{1}{l|}{210.81 (0.89)} &
+  7 &
+  \multicolumn{1}{l|}{377.39 (1.69)} &
+  6 &
+  \multicolumn{1}{l|}{2359.92 (27.60)} &
+  4 &
+  \multicolumn{1}{l|}{2663.73 (1.94)} &
+  3 &
+  \multicolumn{1}{l|}{78.78 (5.34)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{75.86 (6.07)}} &
+  8 &
+  \multicolumn{1}{l|}{19.10 (1.45)} &
+  4 &
+  65.66 (4.91) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LITE}} &
+  6 &
+  \multicolumn{1}{l|}{210.65 (1.03)} &
+  9 &
+  \multicolumn{1}{l|}{375.27 (2.17)} &
+  5 &
+  \multicolumn{1}{l|}{2375.86 (18.11)} &
+  4 &
+  \multicolumn{1}{l|}{2663.61 (6.83)} &
+  5 &
+  \multicolumn{1}{l|}{81.18 (4.53)} &
+  2 &
+  \multicolumn{1}{l|}{79.01 (3.57)} &
+  6 &
+  \multicolumn{1}{l|}{17.49 (0.61)} &
+  6 &
+  70.38 (14.64) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LINE}} &
+  5 &
+  \multicolumn{1}{l|}{211.66 (0.97)} &
+  8 &
+  \multicolumn{1}{l|}{376.62 (0.94)} &
+  7 &
+  \multicolumn{1}{l|}{2340.39 (16.34)} &
+  4 &
+  \multicolumn{1}{l|}{2664.13 (2.91)} &
+  6 &
+  \multicolumn{1}{l|}{81.48 (3.61)} &
+  3 &
+  \multicolumn{1}{l|}{80.32 (4.12)} &
+  7 &
+  \multicolumn{1}{l|}{18.79 (1.05)} &
+  3 &
+  65.46 (3.48) \\
+\hline
+\multicolumn{1}{l}{\textbf{}} &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    \\ \hline
+\multicolumn{1}{c|}{\multirow{9}{*}{\textbf{LOESS}}} &
+  \multicolumn{1}{l|}{\texttt{FLASH}} &
+  4 &
+  \multicolumn{1}{l|}{311.51 (10.44)} &
+  5 &
+  \multicolumn{1}{l|}{574.15 (23.25)} &
+  4 &
+  \multicolumn{1}{l|}{2816.69 (85.18)} &
+  4 &
+  \multicolumn{1}{l|}{3714.29 (85.94)} &
+  2 &
+  \multicolumn{1}{l|}{51.07 (31.84)} &
+  6 &
+  \multicolumn{1}{l|}{78.61 (4.87)} &
+  4 &
+  \multicolumn{1}{l|}{0.52 (0.50)} &
+  \cellcolor{blue!15}1 &
+  \cellcolor{blue!15}\textbf{0.74 (0.85)} \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{GA}} &
+  3 &
+  \multicolumn{1}{l|}{348.29 (26.12)} &
+  2 &
+  \multicolumn{1}{l|}{709.85 (33.55)} &
+  3 &
+  \multicolumn{1}{l|}{3058.71 (322.98)} &
+  3 &
+  \multicolumn{1}{l|}{4203.46 (256.08)} &
+  2 &
+  \multicolumn{1}{l|}{49.39 (33.67)} &
+  4 &
+  \multicolumn{1}{l|}{55.68 (29.46)} &
+  2 &
+  \multicolumn{1}{l|}{0.31 (0.26)} &
+  2 &
+  1.22 (1.39) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{SMAC}} &
+  2 &
+  \multicolumn{1}{l|}{355.36 (20.77)} &
+  2 &
+  \multicolumn{1}{l|}{717.96 (48.99)} &
+  2 &
+  \multicolumn{1}{l|}{3407.03 (407.41)} &
+  2 &
+  \multicolumn{1}{l|}{4402.64 (272.50)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{39.68 (38.67)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{11.15 (23.75)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{0.29 (0.20)}} &
+  5 &
+  1.96 (1.94) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{HEBO}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{449.10 (39.84)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{959.90 (122.62)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{4184.27 (641.12)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{5255.88 (348.69)}} &
+  3 &
+  \multicolumn{1}{l|}{60.50 (30.92)} &
+  3 &
+  \multicolumn{1}{l|}{54.53 (35.69)} &
+  3 &
+  \multicolumn{1}{l|}{0.44 (0.24)} &
+  5 &
+  2.45 (2.14) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{BestConfig}} &
+  7 &
+  \multicolumn{1}{l|}{271.13 (11.58)} &
+  4 &
+  \multicolumn{1}{l|}{632.20 (32.35)} &
+  5 &
+  \multicolumn{1}{l|}{2754.14 (86.48)} &
+  7 &
+  \multicolumn{1}{l|}{3563.85 (84.74)} &
+  5 &
+  \multicolumn{1}{l|}{78.98 (4.64)} &
+  5 &
+  \multicolumn{1}{l|}{72.86 (10.58)} &
+  5 &
+  \multicolumn{1}{l|}{0.61 (0.51)} &
+  6 &
+  4.93 (2.79) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{PromiseTune}} &
+  3 &
+  \multicolumn{1}{l|}{350.68 (13.45)} &
+  3 &
+  \multicolumn{1}{l|}{693.50 (43.02)} &
+  3 &
+  \multicolumn{1}{l|}{3050.35 (368.98)} &
+  3 &
+  \multicolumn{1}{l|}{4182.51 (160.77)} &
+  3 &
+  \multicolumn{1}{l|}{55.76 (35.56)} &
+  2 &
+  \multicolumn{1}{l|}{47.57 (38.19)} &
+  3 &
+  \multicolumn{1}{l|}{0.39 (0.47)} &
+  4 &
+  1.51 (1.43) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{RS}} &
+  6 &
+  \multicolumn{1}{l|}{287.17 (16.40)} &
+  6 &
+  \multicolumn{1}{l|}{563.76 (25.57)} &
+  6 &
+  \multicolumn{1}{l|}{2686.21 (68.95)} &
+  6 &
+  \multicolumn{1}{l|}{3614.90 (122.80)} &
+  4 &
+  \multicolumn{1}{l|}{71.05 (18.32)} &
+  4 &
+  \multicolumn{1}{l|}{66.94 (21.17)} &
+  6 &
+  \multicolumn{1}{l|}{1.76 (1.52)} &
+  4 &
+  1.92 (1.61) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LITE}} &
+  8 &
+  \multicolumn{1}{l|}{260.47 (13.12)} &
+  7 &
+  \multicolumn{1}{l|}{474.57 (7.90)} &
+  7 &
+  \multicolumn{1}{l|}{2646.13 (72.80)} &
+  8 &
+  \multicolumn{1}{l|}{3354.80 (200.75)} &
+  3 &
+  \multicolumn{1}{l|}{58.08 (30.17)} &
+  7 &
+  \multicolumn{1}{l|}{83.50 (7.59)} &
+  5 &
+  \multicolumn{1}{l|}{0.66 (0.56)} &
+  3 &
+  1.27 (1.45) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LINE}} &
+  5 &
+  \multicolumn{1}{l|}{291.30 (12.10)} &
+  5 &
+  \multicolumn{1}{l|}{574.80 (39.60)} &
+  5 &
+  \multicolumn{1}{l|}{2739.51 (104.07)} &
+  5 &
+  \multicolumn{1}{l|}{3684.79 (118.65)} &
+  4 &
+  \multicolumn{1}{l|}{69.79 (20.12)} &
+  5 &
+  \multicolumn{1}{l|}{67.34 (15.15)} &
+  6 &
+  \multicolumn{1}{l|}{1.09 (0.81)} &
+  5 &
+  2.97 (2.60) \\
+\hline
+\multicolumn{1}{l}{\textbf{}} &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    \\ \hline
+\multicolumn{1}{c|}{\multirow{9}{*}{\textbf{RF}}} &
+  \multicolumn{1}{l|}{\texttt{FLASH}} &
+  3 &
+  \multicolumn{1}{l|}{271.59 (0.59)} &
+  2 &
+  \multicolumn{1}{l|}{426.29 (11.54)} &
+  3 &
+  \multicolumn{1}{l|}{2665.96 (2.44)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{3310.07 (588.44)}} &
+  4 &
+  \multicolumn{1}{l|}{77.27 (4.30)} &
+  4 &
+  \multicolumn{1}{l|}{76.49 (3.49)} &
+  2 &
+  \multicolumn{1}{l|}{9.26 (0.06)} &
+  2 &
+  22.55 (0.64) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{GA}} &
+  6 &
+  \multicolumn{1}{l|}{260.85 (15.01)} &
+  4 &
+  \multicolumn{1}{l|}{408.77 (10.15)} &
+  3 &
+  \multicolumn{1}{l|}{2663.46 (11.64)} &
+  6 &
+  \multicolumn{1}{l|}{2751.21 (54.94)} &
+  3 &
+  \multicolumn{1}{l|}{73.80 (5.15)} &
+  3 &
+  \multicolumn{1}{l|}{75.49 (5.18)} &
+  4 &
+  \multicolumn{1}{l|}{9.39 (0.21)} &
+  3 &
+  23.12 (0.99) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{SMAC}} &
+  2 &
+  \multicolumn{1}{l|}{273.12 (0.38)} &
+  3 &
+  \multicolumn{1}{l|}{417.15 (19.34)} &
+  2 &
+  \multicolumn{1}{l|}{2674.00 (8.02)} &
+  3 &
+  \multicolumn{1}{l|}{2981.13 (414.12)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{70.59 (3.48)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{69.32 (3.95)}} &
+  5 &
+  \multicolumn{1}{l|}{9.40 (0.12)} &
+  5 &
+  23.43 (0.52) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{HEBO}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{274.34 (0.80)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}429.94 (12.14)} &
+  3 &
+  \multicolumn{1}{l|}{2665.86 (6.95)} &
+  3 &
+  \multicolumn{1}{l|}{2992.71 (295.87)} &
+  2 &
+  \multicolumn{1}{l|}{71.12 (4.15)} &
+  2 &
+  \multicolumn{1}{l|}{73.75 (3.59)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{9.21 (0.08)}} &
+  \cellcolor{blue!15}1 &
+  \cellcolor{blue!15}\textbf{21.30 (0.54)} \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{BestConfig}} &
+  8 &
+  \multicolumn{1}{l|}{218.84 (1.24)} &
+  8 &
+  \multicolumn{1}{l|}{391.38 (2.31)} &
+  4 &
+  \multicolumn{1}{l|}{2648.76 (7.13)} &
+  8 &
+  \multicolumn{1}{l|}{2691.33 (5.68)} &
+  7 &
+  \multicolumn{1}{l|}{79.19 (2.62)} &
+  7 &
+  \multicolumn{1}{l|}{79.03 (4.14)} &
+  7 &
+  \multicolumn{1}{l|}{9.97 (0.24)} &
+  6 &
+  26.63 (3.14) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{PromiseTune}} &
+  2 &
+  \multicolumn{1}{l|}{273.14 (0.33)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{431.42 (12.33)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{2676.88 (11.09)}} &
+  2 &
+  \multicolumn{1}{l|}{3184.12 (565.22)} &
+  3 &
+  \multicolumn{1}{l|}{71.95 (2.29)} &
+  2 &
+  \multicolumn{1}{l|}{71.15 (3.29)} &
+  3 &
+  \multicolumn{1}{l|}{9.29 (0.13)} &
+  4 &
+  23.15 (0.78) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{RS}} &
+  5 &
+  \multicolumn{1}{l|}{265.38 (6.39)} &
+  6 &
+  \multicolumn{1}{l|}{394.54 (2.76)} &
+  3 &
+  \multicolumn{1}{l|}{2668.17 (81.83)} &
+  4 &
+  \multicolumn{1}{l|}{2827.67 (124.50)} &
+  6 &
+  \multicolumn{1}{l|}{78.34 (4.30)} &
+  6 &
+  \multicolumn{1}{l|}{78.09 (4.14)} &
+  8 &
+  \multicolumn{1}{l|}{10.12 (0.44)} &
+  8 &
+  28.35 (2.00) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LITE}} &
+  7 &
+  \multicolumn{1}{l|}{251.63 (21.80)} &
+  7 &
+  \multicolumn{1}{l|}{392.71 (4.71)} &
+  6 &
+  \multicolumn{1}{l|}{2629.20 (7.28)} &
+  7 &
+  \multicolumn{1}{l|}{2701.28 (32.36)} &
+  5 &
+  \multicolumn{1}{l|}{77.84 (3.44)} &
+  3 &
+  \multicolumn{1}{l|}{76.42 (3.94)} &
+  5 &
+  \multicolumn{1}{l|}{9.45 (0.18)} &
+  6 &
+  24.69 (1.88) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LINE}} &
+  4 &
+  \multicolumn{1}{l|}{266.66 (2.06)} &
+  5 &
+  \multicolumn{1}{l|}{396.69 (10.13)} &
+  5 &
+  \multicolumn{1}{l|}{2641.00 (6.32)} &
+  5 &
+  \multicolumn{1}{l|}{2792.37 (94.22)} &
+  7 &
+  \multicolumn{1}{l|}{80.12 (4.68)} &
+  5 &
+  \multicolumn{1}{l|}{77.71 (3.39)} &
+  6 &
+  \multicolumn{1}{l|}{9.64 (0.17)} &
+  7 &
+  27.37 (1.61) \\
+\hline
+\multicolumn{1}{l}{\textbf{}} &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    \\ \hline
+\multicolumn{1}{c|}{\multirow{9}{*}{\textbf{DaL-RF}}} &
+  \multicolumn{1}{l|}{\texttt{FLASH}} &
+  3 &
+  \multicolumn{1}{l|}{271.50 (0.60)} &
+  5 &
+  \multicolumn{1}{l|}{408.29 (7.97)} &
+  2 &
+  \multicolumn{1}{l|}{2667.95 (6.26)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{3266.83 (601.59)}} &
+  5 &
+  \multicolumn{1}{l|}{75.72 (4.10)} &
+  3 &
+  \multicolumn{1}{l|}{74.56 (5.45)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{9.23 (0.05)}} &
+  2 &
+  22.97 (0.41) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{GA}} &
+  7 &
+  \multicolumn{1}{l|}{250.61 (16.58)} &
+  4 &
+  \multicolumn{1}{l|}{410.58 (6.35)} &
+  3 &
+  \multicolumn{1}{l|}{2665.60 (19.56)} &
+  6 &
+  \multicolumn{1}{l|}{2755.41 (67.64)} &
+  4 &
+  \multicolumn{1}{l|}{74.29 (3.17)} &
+  4 &
+  \multicolumn{1}{l|}{74.66 (5.29)} &
+  3 &
+  \multicolumn{1}{l|}{9.27 (0.20)} &
+  3 &
+  23.46 (0.74) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{SMAC}} &
+  2 &
+  \multicolumn{1}{l|}{272.76 (0.74)} &
+  3 &
+  \multicolumn{1}{l|}{414.60 (5.36)} &
+  2 &
+  \multicolumn{1}{l|}{2669.42 (8.26)} &
+  4 &
+  \multicolumn{1}{l|}{2841.66 (63.61)} &
+  2 &
+  \multicolumn{1}{l|}{69.27 (3.24)} &
+  2 &
+  \multicolumn{1}{l|}{70.53 (3.05)} &
+  4 &
+  \multicolumn{1}{l|}{9.44 (0.25)} &
+  4 &
+  24.20 (1.21) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{HEBO}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{274.58 (1.03)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{420.22 (6.71)}} &
+  3 &
+  \multicolumn{1}{l|}{2665.79 (6.55)} &
+  2 &
+  \multicolumn{1}{l|}{3082.09 (401.37)} &
+  3 &
+  \multicolumn{1}{l|}{71.17 (4.62)} &
+  3 &
+  \multicolumn{1}{l|}{72.91 (5.30)} &
+  2 &
+  \multicolumn{1}{l|}{9.25 (0.06)} &
+  \cellcolor{blue!15}1 &
+  \cellcolor{blue!15}\textbf{21.48 (0.82)} \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{BestConfig}} &
+  8 &
+  \multicolumn{1}{l|}{218.96 (0.77)} &
+  7 &
+  \multicolumn{1}{l|}{395.89 (3.84)} &
+  4 &
+  \multicolumn{1}{l|}{2652.75 (9.88)} &
+  7 &
+  \multicolumn{1}{l|}{2702.17 (13.11)} &
+  6 &
+  \multicolumn{1}{l|}{78.03 (3.47)} &
+  5 &
+  \multicolumn{1}{l|}{77.86 (3.39)} &
+  7 &
+  \multicolumn{1}{l|}{9.98 (0.20)} &
+  7 &
+  26.69 (1.72) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{PromiseTune}} &
+  2 &
+  \multicolumn{1}{l|}{272.85 (0.66)} &
+  2 &
+  \multicolumn{1}{l|}{416.10 (6.64)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}2689.30 (16.62)} &
+  3 &
+  \multicolumn{1}{l|}{2914.36 (21.45)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{68.97 (3.82)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{68.24 (2.72)}} &
+  4 &
+  \multicolumn{1}{l|}{9.54 (0.35)} &
+  2 &
+  23.15 (0.82) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{RS}} &
+  4 &
+  \multicolumn{1}{l|}{268.60 (1.36)} &
+  7 &
+  \multicolumn{1}{l|}{396.13 (6.28)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{2689.36 (140.89)}} &
+  5 &
+  \multicolumn{1}{l|}{2776.87 (54.21)} &
+  7 &
+  \multicolumn{1}{l|}{80.21 (1.81)} &
+  7 &
+  \multicolumn{1}{l|}{79.66 (3.38)} &
+  6 &
+  \multicolumn{1}{l|}{9.65 (0.30)} &
+  8 &
+  27.31 (2.35) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LITE}} &
+  6 &
+  \multicolumn{1}{l|}{256.17 (15.89)} &
+  6 &
+  \multicolumn{1}{l|}{397.95 (6.17)} &
+  6 &
+  \multicolumn{1}{l|}{2629.93 (13.04)} &
+  4 &
+  \multicolumn{1}{l|}{2857.76 (305.89)} &
+  4 &
+  \multicolumn{1}{l|}{75.53 (4.05)} &
+  4 &
+  \multicolumn{1}{l|}{77.11 (4.03)} &
+  5 &
+  \multicolumn{1}{l|}{9.57 (0.24)} &
+  5 &
+  25.29 (3.29) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LINE}} &
+  5 &
+  \multicolumn{1}{l|}{267.08 (1.41)} &
+  7 &
+  \multicolumn{1}{l|}{396.37 (5.30)} &
+  5 &
+  \multicolumn{1}{l|}{2644.82 (14.32)} &
+  4 &
+  \multicolumn{1}{l|}{2851.10 (274.74)} &
+  7 &
+  \multicolumn{1}{l|}{79.63 (2.74)} &
+  6 &
+  \multicolumn{1}{l|}{78.83 (3.01)} &
+  6 &
+  \multicolumn{1}{l|}{9.72 (0.24)} &
+  6 &
+  26.50 (1.27) \\
+\hline
+\multicolumn{1}{l}{\textbf{}} &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    &
+    \\ \hline
+\multicolumn{1}{c|}{\multirow{9}{*}{\textbf{U-RF}}} &
+  \multicolumn{1}{l|}{\texttt{FLASH}} &
+  3 &
+  \multicolumn{1}{l|}{266.07 (1.12)} &
+  3 &
+  \multicolumn{1}{l|}{370.84 (9.37)} &
+  2 &
+  \multicolumn{1}{l|}{2620.92 (2.96)} &
+  2 &
+  \multicolumn{1}{l|}{2731.58 (64.39)} &
+  3 &
+  \multicolumn{1}{l|}{80.59 (4.28)} &
+  3 &
+  \multicolumn{1}{l|}{77.97 (5.19)} &
+  2 &
+  \multicolumn{1}{l|}{9.70 (0.12)} &
+  \cellcolor{blue!15}1 &
+  \cellcolor{blue!15}26.08 (0.65) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{GA}} &
+  6 &
+  \multicolumn{1}{l|}{247.12 (16.55)} &
+  4 &
+  \multicolumn{1}{l|}{363.34 (4.17)} &
+  4 &
+  \multicolumn{1}{l|}{2614.92 (12.94)} &
+  4 &
+  \multicolumn{1}{l|}{2688.35 (68.79)} &
+  2 &
+  \multicolumn{1}{l|}{78.41 (4.22)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{74.67 (3.32)}} &
+  4 &
+  \multicolumn{1}{l|}{9.79 (0.32)} &
+  2 &
+  26.36 (1.03) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{SMAC}} &
+  2 &
+  \multicolumn{1}{l|}{267.58 (0.73)} &
+  4 &
+  \multicolumn{1}{l|}{362.33 (9.83)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{2624.59 (5.03)}} &
+  5 &
+  \multicolumn{1}{l|}{2680.46 (33.48)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}77.91 (2.57)} &
+  2 &
+  \multicolumn{1}{l|}{75.57 (2.72)} &
+  3 &
+  \multicolumn{1}{l|}{9.78 (0.21)} &
+  3 &
+  28.61 (2.35) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{HEBO}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{269.73 (1.02)}} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{378.63 (9.90)}} &
+  3 &
+  \multicolumn{1}{l|}{2617.48 (6.41)} &
+  3 &
+  \multicolumn{1}{l|}{2714.50 (61.35)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{76.48 (4.69)}} &
+  2 &
+  \multicolumn{1}{l|}{76.68 (1.84)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{9.63 (0.10)}} &
+  \cellcolor{blue!15}1 &
+  \cellcolor{blue!15}\textbf{24.06 (0.68)} \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{BestConfig}} &
+  7 &
+  \multicolumn{1}{l|}{215.01 (1.53)} &
+  7 &
+  \multicolumn{1}{l|}{343.50 (3.96)} &
+  5 &
+  \multicolumn{1}{l|}{2605.13 (8.90)} &
+  8 &
+  \multicolumn{1}{l|}{2634.91 (4.57)} &
+  2 &
+  \multicolumn{1}{l|}{78.97 (5.40)} &
+  6 &
+  \multicolumn{1}{l|}{80.58 (3.55)} &
+  7 &
+  \multicolumn{1}{l|}{10.77 (0.43)} &
+  5 &
+  31.00 (2.88) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{PromiseTune}} &
+  2 &
+  \multicolumn{1}{l|}{267.55 (0.76)} &
+  2 &
+  \multicolumn{1}{l|}{375.94 (9.57)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}2624.39 (2.94)} &
+  \cellcolor{blue!15}1 &
+  \multicolumn{1}{l|}{\cellcolor{blue!15}\textbf{2788.95 (57.66)}} &
+  2 &
+  \multicolumn{1}{l|}{79.27 (3.59)} &
+  3 &
+  \multicolumn{1}{l|}{77.81 (2.76)} &
+  4 &
+  \multicolumn{1}{l|}{9.91 (0.17)} &
+  2 &
+  26.70 (0.92) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{RS}} &
+  4 &
+  \multicolumn{1}{l|}{261.06 (1.89)} &
+  7 &
+  \multicolumn{1}{l|}{343.88 (2.88)} &
+  7 &
+  \multicolumn{1}{l|}{2596.51 (8.24)} &
+  6 &
+  \multicolumn{1}{l|}{2654.68 (8.64)} &
+  4 &
+  \multicolumn{1}{l|}{80.84 (5.09)} &
+  4 &
+  \multicolumn{1}{l|}{78.91 (3.20)} &
+  5 &
+  \multicolumn{1}{l|}{10.39 (0.19)} &
+  7 &
+  33.11 (3.51) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LITE}} &
+  5 &
+  \multicolumn{1}{l|}{256.61 (13.31)} &
+  6 &
+  \multicolumn{1}{l|}{346.46 (5.94)} &
+  7 &
+  \multicolumn{1}{l|}{2595.31 (9.71)} &
+  7 &
+  \multicolumn{1}{l|}{2643.17 (19.56)} &
+  2 &
+  \multicolumn{1}{l|}{79.15 (6.89)} &
+  5 &
+  \multicolumn{1}{l|}{79.11 (3.91)} &
+  5 &
+  \multicolumn{1}{l|}{9.94 (0.31)} &
+  4 &
+  30.66 (6.37) \\
+\multicolumn{1}{c|}{} &
+  \multicolumn{1}{l|}{\texttt{LINE}} &
+  4 &
+  \multicolumn{1}{l|}{261.21 (1.79)} &
+  5 &
+  \multicolumn{1}{l|}{348.66 (10.40)} &
+  6 &
+  \multicolumn{1}{l|}{2603.06 (9.87)} &
+  5 &
+  \multicolumn{1}{l|}{2672.99 (48.70)} &
+  3 &
+  \multicolumn{1}{l|}{79.78 (5.04)} &
+  3 &
+  \multicolumn{1}{l|}{77.94 (7.46)} &
+  6 &
+  \multicolumn{1}{l|}{10.48 (0.47)} &
+  6 &
+  32.43 (3.38) \\
+\hline
+\end{tabular}

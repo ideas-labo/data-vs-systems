@@ -1,5 +1,0 @@
-Scale,Workload,Algorithm,r,Mean (Std),IQR
-medium,tomcat_medium,ezr_pool,3,2863.60 (93.27),132.51
-medium,tomcat_medium,flash_pool,1,2948.15 (68.07),133.28
-medium,tomcat_medium,line_pool,1,2960.47 (130.15),101.68
-medium,tomcat_medium,random_search_pool,2,2914.14 (73.93),108.21
