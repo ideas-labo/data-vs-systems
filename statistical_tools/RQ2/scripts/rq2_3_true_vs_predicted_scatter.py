@@ -5,7 +5,7 @@
 Plot RQ2 true-vs-predicted performance scatter plots.
 
 Input:
-    fallback_analysis/RQ3/results/predictions/<fallback>/<system>_<scale>_predictions.csv
+    statistical_tools/RQ3/results/predictions/<fallback>/<system>_<scale>_predictions.csv
 
 Each input row must provide `true_perf` and `pred_perf`. The plot compares
 ground-truth performance from the real system with reconstructed performance
@@ -42,7 +42,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 RQ2_DIR = SCRIPT_DIR.parent
 STATISTICAL_TOOLS_DIR = RQ2_DIR.parent
 REPO_ROOT = STATISTICAL_TOOLS_DIR.parent
-DEFAULT_PREDICTION_ROOT = REPO_ROOT / "fallback_analysis" / "RQ3" / "results" / "predictions"
+DEFAULT_PREDICTION_ROOT = STATISTICAL_TOOLS_DIR / "RQ3" / "results" / "predictions"
 DEFAULT_OUTPUT_ROOT = RQ2_DIR / "results"
 
 SYSTEM_ORDER = ["mysql", "postgresql", "httpd", "tomcat", "gcc", "clang", "x264", "x265"]

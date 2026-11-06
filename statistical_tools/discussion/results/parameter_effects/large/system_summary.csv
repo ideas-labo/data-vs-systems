@@ -1,0 +1,9 @@
+system,strongest_parameter,max_percentile_eta_squared
+mysql,innodb_flush_log_at_trx_commit,0.33916169273577246
+postgresql,seq_page_cost,0.022770802917829406
+httpd,KeepAlive,0.42105128293698424
+tomcat,minSpareThreads,0.1332506487535772
+gcc,fno-inline-small-functions,0.00045202724506701115
+clang,funroll-loops,0.00016764055517991448
+x264,me,0.2577332495286646
+x265,rd,0.3699205731784498
