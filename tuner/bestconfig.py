@@ -35,7 +35,7 @@ class BestConfigTuner:
         self.feature_types = getattr(self.config_manager, "feature_types", ["categorical"] * self.config_manager.config_dim)
         self.value_domains = self.config_manager.value_domains
 
-    # ================== 主入口 ==================
+    # Tuning loop
 
     def tuning(self) -> Tuple[List, float]:
 
@@ -46,7 +46,7 @@ class BestConfigTuner:
             best_perf = math.inf
         best_config = None
 
-        # ===== Step 0: initialize DDS global sampling =====
+        # Initialize DDS global sampling.
         init_configs = self.dds_sampling(self.sampling_size)
         evaluated, self.alive = self.config_manager.evaluate(init_configs, self.fallback, self.alive)
         # evaluated: List[(cfg, perf)]
@@ -65,12 +65,12 @@ class BestConfigTuner:
                 self.logger.log_all_results(self.all_results)
             return None, None
 
-        # ===== main loop：until alive exhausted =====
+        # Continue until the evaluation budget is exhausted.
         while self.alive > 0:
             print(f"[Run {self.run}] | [BestConfig] Evaluations left: {self.alive}")
             found_better = False
 
-            # ===== local RBS + DDS sampling =====
+            # Local RBS and DDS sampling.
             for round_id in range(self.max_rounds):
                 print(f"[BestConfig] RBS round {round_id + 1}/{self.max_rounds}")
 
@@ -105,7 +105,7 @@ class BestConfigTuner:
             if self.alive <= 0:
                 break
 
-            # ===== if budget is still available：global DDS once again =====
+            # Resume global DDS sampling if budget remains.
             print("[BestConfig] Global DDS resampling...")
             global_samples = self.dds_sampling(self.sampling_size)
             new_evaluated, self.alive = self.config_manager.evaluate(global_samples, self.fallback, self.alive)
@@ -117,7 +117,7 @@ class BestConfigTuner:
                     best_perf = perf
                     best_config = cfg
 
-        # 记录全部结果
+        # Log all evaluated configurations.
         if self.logger is not None:
             self.logger.log_all_results(self.all_results)
 

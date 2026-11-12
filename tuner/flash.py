@@ -92,7 +92,7 @@ class FLASHTuner:
         :return: processed list of numeric configs
         """
         processed_configs = []
-        value_domains = self.config_manager.value_domains  # 从 ConfigManager 拿到所有维度的取值空间
+        value_domains = self.config_manager.value_domains  # Available values for each configuration option.
 
         for cfg in configs:
             processed_cfg = []

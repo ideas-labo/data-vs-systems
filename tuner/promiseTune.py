@@ -194,7 +194,7 @@ class PromiseTuner:
             if adjacency_matrix.shape != (num_features, num_features):
                 raise ValueError("Adjacency matrix shape mismatch.")
             adjacency_matrix = adjacency_matrix.T
-            adjacency_matrix[:, -1] = 0  # 保证 performance 没有 outgoing edge
+            adjacency_matrix[:, -1] = 0  # Prevent outgoing edges from the performance variable.
         except Exception as e:
             print(f"[DEBUG] FCI failed or matrix invalid: {e}", flush=True)
             return filtered_rules
@@ -378,7 +378,7 @@ class PromiseTuner:
         :return: processed list of numeric configs
         """
         processed_configs = []
-        value_domains = self.config_manager.value_domains  # 从 ConfigManager 拿到所有维度的取值空间
+        value_domains = self.config_manager.value_domains  # Available values for each configuration option.
 
         for cfg in configs:
             processed_cfg = []
@@ -413,14 +413,14 @@ class PromiseTuner:
         for j, rule in enumerate(rules):
             col = X_arr[:, j]
 
-            # 去掉常数列
+            # Remove constant columns.
             if np.all(col == col[0]):
                 continue
 
             covered_idx = np.where(col == 1)[0]
             support = len(covered_idx)
 
-            # 去掉覆盖太少的 rule
+            # Discard rules with insufficient support.
             if support < min_support:
                 continue
 

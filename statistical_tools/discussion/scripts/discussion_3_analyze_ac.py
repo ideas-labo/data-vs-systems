@@ -20,7 +20,7 @@ def process_system(system, args):
     configs, performance, _, _ = load_system_dataset(args.dataset_root, system, args.scale, None)
     maximize = infer_maximize(system)
     score = performance if maximize else -performance
-    # Retain the existing RQ3 radius to preserve the AC neighborhood definition.
+    # Use the cached RQ3 neighborhood radius.
     radius_path = args.cache_dir/'summary'/f'{system}_{args.scale}_summary.csv'
     radius = float(pd.read_csv(radius_path).radius.iloc[0])
     graph = build_neighbor_graph(encode_configs_for_distance(configs), radius)

@@ -9,7 +9,7 @@ from tabpfn import TabPFNRegressor
 
 
 def to_str_clean(val):
-    # 与你 ConfigManager 的 to_str_clean 对齐：保证 categorical 稳定
+    # Normalize integer-valued floats for consistent categorical encoding.
     if isinstance(val, float) and float(val).is_integer():
         return str(int(val))
     return str(val)
@@ -17,17 +17,17 @@ def to_str_clean(val):
 
 def build_design_matrix(df: pd.DataFrame):
     """
-    这里采用最稳、可复现的编码策略：
-    - numerical: float
-    - categorical: one-hot (drop_first=True)
-    和你主环境的 _design_matrix_from_configs 一致精神，但这里独立实现，避免跨环境依赖。
+    Encode numeric values as floats and categories as one-hot columns.
+
+    The first category is omitted. Encoding is implemented locally so the
+    service can run in a separate environment.
     """
     X_cols = df.columns[:-1]
     y_col = df.columns[-1]
 
     X_raw = df[X_cols].copy()
 
-    # 自动判定每列是 numerical 还是 categorical（与你 detect_feature_types 的逻辑相似）
+    # Infer numeric and categorical feature types.
     feature_types = []
     for c in X_cols:
         vals = X_raw[c].values
@@ -48,7 +48,7 @@ def build_design_matrix(df: pd.DataFrame):
             else:
                 feature_types.append("numerical")
 
-    # one-hot（drop_first=True）
+    # One-hot encode categories, omitting the first level.
     mats = []
     meta = {"X_cols": list(X_cols), "feature_types": feature_types, "cat_levels": {}}
 
@@ -74,7 +74,7 @@ def design_vector_from_cfg(cfg_list, meta):
     feature_types = meta["feature_types"]
     cat_levels = meta["cat_levels"]
 
-    # cfg_list 长度 = len(X_cols)
+    # Configuration values follow the training column order.
     row = []
     for j, val in enumerate(cfg_list):
         if feature_types[j] == "numerical":
@@ -102,7 +102,7 @@ def main():
 
     os.makedirs(args.cache_dir, exist_ok=True)
 
-    # cache key: based on csv path + max_train + seed (你也可以加更多参数)
+    # Cache by CSV basename, training limit, and seed.
     cache_key = f"{os.path.basename(args.csv)}__n{args.max_train}__s{args.seed}.pkl"
     cache_path = os.path.join(args.cache_dir, cache_key)
 
@@ -142,7 +142,7 @@ def main():
             f"expected {len(meta['X_cols'])}"
         )
 
-    # 尝试把可转 float 的转 float（保持与你主框架一致）
+    # Convert numeric values to floats and retain categorical values.
     parsed = []
     for v in cfg_vals:
         try:
@@ -153,7 +153,7 @@ def main():
     x = design_vector_from_cfg(parsed, meta)
     yhat = float(model.predict(x)[0])
 
-    # stdout 输出一个纯数字，方便主进程读取
+    # Write a numeric prediction to stdout for the calling process.
     sys.stdout.write(str(yhat))
 
 

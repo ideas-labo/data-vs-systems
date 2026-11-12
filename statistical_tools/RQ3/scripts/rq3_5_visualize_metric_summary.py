@@ -34,10 +34,10 @@ ACCURACY_INPUT_DIR = RESULTS_DIR / "accuracy"
 LANDSCAPE_INPUT_DIR = RESULTS_DIR / "landscape"
 OUTPUT_DIR = RESULTS_DIR / "visualization"
 
-# 只分析 large；如果你后面想分析 medium/small，可以改成 None 或对应列表
+# Dataset scales to include; None includes all scales.
 TARGET_SCALE = "large"
 
-# 需要可视化的指标
+# Metrics to plot.
 ACCURACY_METRICS = [
     "mre",
     # "median_mre",
@@ -51,7 +51,7 @@ LANDSCAPE_METRICS = [
     "auto_correlation_abs_error",
 ]
 
-# fallback 显示顺序
+# Fallback display order.
 FALLBACK_ORDER = [
     "worst",
     "1NN",
@@ -63,7 +63,7 @@ FALLBACK_ORDER = [
     "dal_rf",
 ]
 
-# 是否在柱子上显示数值
+# Show values above bars.
 SHOW_VALUE_LABELS = True
 
 
@@ -242,7 +242,7 @@ def plot_metric_for_system(
 
     print(f"[SAVE] {save_path}")
 
-    # 可选：顺手把用于画图的均值表也存一下，便于检查
+    # Save the mean values used in the plot.
     summary_csv = output_dir / f"{metric}_summary.csv"
     pivot_df.to_csv(summary_csv)
     print(f"[SAVE] {summary_csv}")

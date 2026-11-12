@@ -1,36 +1,20 @@
-# =========================
-# Python bytecode / cache
-# =========================
-__pycache__/
-*.py[cod]
-*$py.class
-
-# =========================
-# Virtual environments
-# =========================
-.venv/
+# Python environments and caches
+.venv*/
 venv/
 env/
 ENV/
-.venv_tabpfn/
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+.ipynb_checkpoints/
 
-# =========================
-# Build / packaging
-# =========================
+# Build artifacts and tool caches
 build/
 dist/
 .eggs/
 *.egg-info/
 *.egg
-
-# =========================
-# Jupyter / notebook
-# =========================
-.ipynb_checkpoints/
-
-# =========================
-# Test / coverage / cache
-# =========================
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -40,46 +24,36 @@ dist/
 .coverage.*
 htmlcov/
 
-# =========================
-# Logs
-# =========================
-logs/
-*.log
-
-
-
-# =========================
-# OS files
-# =========================
-.DS_Store
-Thumbs.db
-
-# =========================
-# IDE / editor
-# =========================
+# Editors and local assistant configuration
 .idea/
 .vscode/
 .codex/
+.agents/
+.claude/
+.cursor/
+.aider*
+.cline/
+.continue/
+.mcp.json
 
-# =========================
-# Python version / local config
-# =========================
-.python-version
-
-# =========================
-# Secrets / local credentials
-# =========================
+# Local credentials and environment settings
 .env
 .env.*
+!.env.example
+!.env.template
+.aws/
+.ssh/
+.pypirc
+.netrc
 *.pem
 *.key
 *.crt
 
-# =========================
-# Optional: large datasets
-# If your datasets are large or reproducible elsewhere,
-# keep this ignored. Otherwise remove this line.
-# =========================
-# datasets/
-.venv/
-.venv/
+# Logs and operating-system files
+logs/
+*.log
+.DS_Store
+Thumbs.db
+
+# Local planning notes
+/plan/

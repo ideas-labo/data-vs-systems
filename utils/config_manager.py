@@ -111,7 +111,7 @@ class ConfigManager:
             for row in self.data_df.values
         }
 
-        # config -> index (this is important for checking our code correctness)
+        # Map configurations to their row indices.
         self.config_idx_dict = {}
         for idx, row in self.data_df.iterrows():
             key = tuple(row.iloc[:-1])
@@ -827,7 +827,7 @@ class ConfigManager:
                 ridge=kw.get('ridge', 1e-8),
             ),
 
-            # --- NEW: surrogate models ---
+            # Surrogate models
             'rf': lambda cfg, **kw: self.predict_rf(cfg, auto_fit=True),
             'gp': lambda cfg, **kw: self.predict_gp(cfg, return_std=False, auto_fit=True),
             'rf_uncertainty': lambda cfg, **kw: self.predict_rf_uncertainty_aware(cfg, lam=kw.get('lam', 1.0)),

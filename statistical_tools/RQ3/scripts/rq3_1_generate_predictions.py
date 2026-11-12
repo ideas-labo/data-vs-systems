@@ -21,7 +21,6 @@ PROJECT_ROOT = STATISTICAL_TOOLS_DIR.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-# Adjust this import according to your project structure
 from utils.config_manager import ConfigManager
 
 
@@ -108,10 +107,9 @@ def build_sparse_config_manager(
     """
     Build a ConfigManager whose observed table is train_df.
 
-    Important:
-    - train_df is used for fallback training and exact lookup.
-    - full_df is used only to define the configuration domain / encoder categories.
-      This does not leak performance values into the fallback model.
+    Use train_df for fallback training and exact lookup. Use full_df only
+    for the configuration domain and encoder categories, excluding its
+    performance values from model training.
     """
     goal = infer_optimization_goal(system)
     cm = ConfigManager(system=system, optimization_goal=goal)
@@ -306,7 +304,7 @@ def predict_holdout(
 
     for cfg in cfgs:
         try:
-            # Directly use evaluate() to preserve your original logic:
+            # Evaluate held-out configurations through ConfigManager:
             # exact lookup if observed, otherwise fallback.
             results, _ = cm.evaluate(
                 [cfg],

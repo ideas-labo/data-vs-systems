@@ -22,14 +22,14 @@ def process_single_csv(
     n_large = max(1, math.floor(n * large_ratio))
 
     if not replace:
-        # 无放回时，样本数不能超过 n
+        # Limit sample sizes to the available rows when sampling without replacement.
         n_small = min(n_small, n)
         n_medium = min(n_medium, n)
         n_large = min(n_large, n)
 
     print(f"original rows: {n} -> small: {n_small}, medium: {n_medium}, large: {n_large} (replace={replace})")
 
-    # 关键：每个规模都“从全集独立采样”，因此 random_state 用不同种子即可
+    # Sample each size independently from the full dataset using distinct seeds.
     small_df = df.sample(n=n_small, replace=replace, random_state=seed)
     medium_df = df.sample(n=n_medium, replace=replace, random_state=seed + 1)
     large_df = df.sample(n=n_large, replace=replace, random_state=seed + 2)

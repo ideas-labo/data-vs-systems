@@ -55,7 +55,7 @@ YMAX = None
 XTICK = None   # e.g. "{1,50,100,150,200,250,300,350}"
 YTICK = None   # e.g. "{2500,2800,3100,3400,3700,4000}"
 
-# Legend position copied from your template
+# Legend placement
 LEGEND_AT = "(0.98,0.9)"
 LEGEND_ANCHOR = "south east"
 
@@ -84,7 +84,7 @@ TARGET_COLUMN_CANDIDATES = {
     "x265": ["run_time", "runtime", "execution_time", "time"],
 }
 
-# Style map: kept identical to your current script
+# Plot styles
 STYLE_MAP = {
     "bestconfig": {
         "color": "red",
