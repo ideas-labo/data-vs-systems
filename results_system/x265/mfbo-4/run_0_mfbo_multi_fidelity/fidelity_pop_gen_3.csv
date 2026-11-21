@@ -1,4 +1,0 @@
-Video Type,Resolution,Frame Rate,Time,spearman_corr,evaluated_time,front_level
-Action,360p,15,5s,0.8449887057152898,2.4262266397476195,0
-Standard,360p,15,5s,0.6322217654272672,1.1797250747680663,0
-Action,480p,15,5s,-1.0,0.10924186706542968,0
