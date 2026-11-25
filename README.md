@@ -1,6 +1,5 @@
-# Data-vs-System
+# Reliably Expediting Configuration Tuning Research with Tabular Benchmarks: When and How?
 
-This project studies how fallback strategies in tabular benchmarks affect the evaluation and ranking of configuration tuners.
 
 ![TabEval workflow: real-system execution, tabular-benchmark evaluation, and comparative analysis](img.png)
 
