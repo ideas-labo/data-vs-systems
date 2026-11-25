@@ -1,6 +1,8 @@
-# TabEval
+# Dataset
 
-TabEval studies how fallback strategies in tabular benchmarks affect the evaluation and ranking of configuration tuners. It compares tuning outcomes with real-system results and analyzes prediction accuracy, configuration ordering, and landscape preservation.
+This project studies how fallback strategies in tabular benchmarks affect the evaluation and ranking of configuration tuners.
+
+![TabEval workflow: real-system execution, tabular-benchmark evaluation, and comparative analysis](img.png)
 
 ## Setup
 
@@ -20,7 +22,7 @@ Run commands from the repository root. Select systems, tuners, fallback strategi
 python main.py
 ```
 
-The current runner selects the pool-based tuners with the `pool` strategy. Dataset CSVs contain configuration options followed by the performance column. MySQL, PostgreSQL, HTTPD, and Tomcat maximize performance; the other systems minimize it.
+Dataset CSVs contain configuration options followed by the performance column. MySQL, PostgreSQL, HTTPD, and Tomcat maximize performance; the other systems minimize it.
 
 ## Project structure
 
