@@ -98,8 +98,8 @@ def main():
     compared_algorithms = ['flash_pool', 'random_search_pool', 'ezr_pool', 'line_pool']
 
     # fall back strategies
-    # fallbacks = ['worst', '1NN', 'kNN', 'kNNw', 'loess', 'rf', 'dal_rf', 'rf_uncertainty']
-    fallbacks = ['pool']
+    fallbacks = ['worst', '1NN', 'kNN', 'kNNw', 'loess', 'rf', 'dal_rf', 'rf_uncertainty']
+    # fallbacks = ['pool']
 
     global_start = time.time()
 
